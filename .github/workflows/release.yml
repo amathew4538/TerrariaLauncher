@@ -1,0 +1,103 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build ShadowJar
+        run: ./gradlew shadowJar
+
+      - name: Prepare jpackage input
+        run: |
+          mkdir -p app_jar
+          cp app/build/libs/app-all.jar app_jar/TerrariaLauncher.jar
+
+      - name: Create App Image
+        run: |
+          jpackage --type app-image \
+            --dest app_build \
+            --name "TerrariaLauncher" \
+            --input app_jar/ \
+            --main-jar TerrariaLauncher.jar \
+            --main-class TerrariaLauncher.TerrariaLauncher \
+            --icon package-resources/icon.icns
+
+      - name: Download and Bundle iTerm2
+        run: |
+          curl -L https://iterm2.com/downloads/stable/latest.zip -o iterm.zip
+          unzip iterm.zip -d app_build/
+
+      - name: Create FixPermissions Script
+        run: |
+          cat <<EOF > app_build/FixPermissions.command
+          #!/bin/bash
+          cd "\$(dirname "\$0")"
+          chmod +x TerrariaLauncher.app/Contents/MacOS/TerrariaLauncher
+          chmod +x iTerm.app/Contents/MacOS/iTerm2
+          echo "Permissions fixed! You can now run the launcher."
+          EOF
+          chmod +x app_build/FixPermissions.command
+
+      - name: Package Release ZIP
+        run: |
+          cd app_build
+          zip -r ../TerrariaLauncher-macOS.zip TerrariaLauncher.app iTerm.app FixPermissions.command
+
+      - name: Upload macOS Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: TerrariaLauncher-macOS.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build ShadowJar
+        run: .\gradlew shadowJar
+
+      - name: Create App Image
+        run: |
+          mkdir app_jar
+          copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar
+          jpackage --type app-image `
+            --dest app_build `
+            --name "TerrariaLauncher" `
+            --input app_jar/ `
+            --main-jar TerrariaLauncher.jar `
+            --main-class TerrariaLauncher.TerrariaLauncher `
+            --icon package-resources/icon.ico
+
+      - name: Package Windows ZIP
+        run: |
+          Compress-Archive -Path app_build/TerrariaLauncher -DestinationPath TerrariaLauncher-Windows.zip
+
+      - name: Upload Windows Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: TerrariaLauncher-Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

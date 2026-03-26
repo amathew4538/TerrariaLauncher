@@ -1,4 +1,4 @@
-# Teraria Launcher v1.0: A tModLoader Manager
+# Teraria Launcher v1.0.1: A tModLoader Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
