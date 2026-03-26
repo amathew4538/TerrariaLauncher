@@ -27,7 +27,7 @@ jobs:
 
       - name: Set Build Type to Release
         run: |
-          sed -i 's/${build.type}/release/g' src/main/resources/config.properties
+          sed -i '' 's|\${build.type}|release|g' src/main/resources/config.properties
 
       - name: Build ShadowJar
         run: ./gradlew shadowJar
@@ -97,7 +97,7 @@ jobs:
 
       - name: Set Build Type to Release (Windows)
         run: |
-          (Get-Content src/main/resources/config.properties) -replace '\$\{build.type\}', 'release' | Set-Content src/main/resources/config.properties
+          (Get-Content app/src/main/resources/config.properties) -replace '\$\{build.type\}', 'release' | Set-Content app/src/main/resources/config.properties
         shell: powershell
 
       - name: Build ShadowJar
