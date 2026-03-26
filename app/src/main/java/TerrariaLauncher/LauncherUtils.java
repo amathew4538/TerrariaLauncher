@@ -28,37 +28,53 @@ public class LauncherUtils {
     public static void launchInstance(Path path) {
         String os = System.getProperty("os.name").toLowerCase();
         File folder = path.toFile();
+
+        if (folder.getName().equals("TerrariaLauncher.app") || folder.getName().equals("iTerm.app")) {
+            return;
+        }
+    
         ProcessBuilder pb = new ProcessBuilder();
         pb.directory(folder);
-
+    
         try {
             if (os.contains("win")) {
                 String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
                 pb.command("cmd", "/c", "start", cmd);
-            } else {
-                // macOS Logic
-                if (folder.getName().endsWith(".app")) {
-                    pb.command("open", "-a", folder.getAbsolutePath());
-                } else {
-                    File script = new File(folder, "start-tmodloader.sh");
-                    if (script.exists()) {
-                        script.setExecutable(true);
-                        pb.command("zsh", "-c", "./start-tModLoader.sh");
-                        pb.redirectErrorStream(true);
-                        Process process = pb.start();
-                        showLogWindow(process.getInputStream());
-                        return;
+            } else if (os.contains("mac")) {
+                File script = new File(folder, "start-tmodloader.sh");
+                if (script.exists()) {
+                    script.setExecutable(true);
+                
+                    // Find iTerm.app sitting next to TerrariaLauncher.app
+                    String jarPath = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+                    File bundleDir = new File(jarPath).getParentFile().getParentFile().getParentFile().getParentFile();
+                    File iTerm = new File(bundleDir, "iTerm.app");
+                
+                    if (iTerm.exists()) {
+                        // We use osascript to tell iTerm to stay open and run the command
+                        String[] launchCmd = {
+                            "osascript", "-e",
+                            "tell application \"" + iTerm.getAbsolutePath() + "\"\n" +
+                            "    activate\n" +
+                            "    create window with default profile\n" +
+                            "    tell current session of current window\n" +
+                            "        write text \"cd \\\"" + folder.getAbsolutePath() + "\\\" && ./start-tmodloader.sh\"\n" +
+                            "    end tell\n" +
+                            "end tell"
+                        };
+                        pb.command(launchCmd);
+                    } else {
+                        // Fallback to native Terminal
+                        pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"cd '" + folder.getAbsolutePath() + "' && ./start-tmodloader.sh\"");
                     }
+                    pb.start();
+                    return;
                 }
             }
         
-            // Ensure we actually have a command before starting
-            if (pb.command().isEmpty()) {
-                throw new Exception("No launch command generated for: " + folder.getName());
+            if (!pb.command().isEmpty()) {
+                pb.start();
             }
-        
-            pb.start();
-        
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Launch Error: " + e.getMessage());
@@ -70,7 +86,7 @@ public class LauncherUtils {
 
         String os = System.getProperty("os.name").toLowerCase();
         String baseName = os.contains("win") ? "Terraria.exe" : "Terraria.app";
-    
+
         File baseFile = new File(rootDir, baseName);
         if (baseFile.exists()) {
             container.add(new InstanceRow("Base Terraria", baseFile.toPath(), true));
@@ -85,7 +101,8 @@ public class LauncherUtils {
                 if (!file.isDirectory()) continue;
                 if (name.startsWith(".") || name.equals("app") || name.equals("dist")) continue;
                 if (name.equals(baseName)) continue;
-                if (name.contains("Terraria Launcher")) continue;
+                if (name.contains("TerrariaLauncher")) continue;
+                if (name.contains("iTerm")) continue;
 
                 container.add(new InstanceRow(name, file.toPath(), false));
                 container.add(Box.createVerticalStrut(10));
@@ -107,14 +124,18 @@ public class LauncherUtils {
         logFrame.setVisible(true);
 
         new Thread(() -> {
-            try (java.util.Scanner scanner = new java.util.Scanner(inputStream)) {
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream))) {
+                String line;
+                // readLine() is more reliable for streaming shell outputs than Scanner.hasNextLine()
+                while ((line = reader.readLine()) != null) {
+                    final String capturedLine = line;
                     SwingUtilities.invokeLater(() -> {
-                        textArea.append(line + "\n");
+                        textArea.append(capturedLine + "\n");
                         textArea.setCaretPosition(textArea.getDocument().getLength());
                     });
                 }
+            } catch (java.io.IOException e) {
+                SwingUtilities.invokeLater(() -> textArea.append("--- Stream Closed ---\n"));
             }
         }).start();
     }

@@ -3,9 +3,16 @@
 
 # Ignore Gradle build output directory
 build
+app_build
+app_jar
 
 # Ignore Kotlin plugin data
 .kotlin
 
+# VS Code
+.vscode
+
 # MacOS
 .DS_Store
+.AppleDouble
+.LSOverride
