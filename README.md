@@ -1,4 +1,4 @@
-# Teraria Launcher v1.0.3: A tModLoader Manager
+# Teraria Launcher v1.0.6: A tModLoader Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -84,10 +84,12 @@
 3. ```mkdir app_build app_jar```
 4. ```./gradlew shadowJar```
 5. ```cp app/build/libs/app-all.jar app_jar/TerrariaLauncher.jar```
-6. ```bash
+6. Copy this and change the version number, then run it
+   ```bash
    jpackage --type app-image \
     --dest app_build \
     --name "TerrariaLauncher" \
+    --app-version {REPLACE THIS} \
     --input app_jar/ \
     --main-jar TerrariaLauncher.jar \
     --main-class TerrariaLauncher.TerrariaLauncher \
@@ -103,10 +105,12 @@
    1. In PowerShell: ```./gradlew shadowJar```
    2. In Cmd Prompt: ```gradlew shadowJar```
 5. ```copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar```
-6. ```bash
+6. Copy this and change the version number, then run it
+    ```bash
    jpackage --type app-image `
     --dest app_build `
     --name "TerrariaLauncher" `
+   --app-version {REPLACE THIS} \
     --input app_jar/ `
     --main-jar TerrariaLauncher.jar `
     --main-class TerrariaLauncher.TerrariaLauncher `
