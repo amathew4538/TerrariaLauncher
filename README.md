@@ -25,7 +25,9 @@
 
 ## How to use
 1. Download the app from [Releases](https://github.com/amathew4538/TerrariaLauncher/releases/latest)
-2. Setup your folders like this:
+2. Obtain a tmodloader instance from their [Github](https://github.com/tModLoader/tModLoader/releases/latest)
+3. Setup your folders like this:
+   ### ***NOTE: Your folder names must be in camelCase***
    1. MacOS:
     ```bash
     .
@@ -54,7 +56,7 @@
     .
     └── Terraria/
         ├── TerrariaLauncher.exe
-        ├── Terraria.app
+        ├── Terraria.exe
         ├── calamityMod/
         │   ├── start-tmodloader.bat
         │   ├── LaunchUtils/
@@ -71,9 +73,14 @@
         │   └── ...
         └── ...
     ```
-  ### ***NOTE: Your folder names must be in camelCase***
-  
-  3. Run the app and click launch on the instance you want!
+  4. Add an `icon.png` to every folder (base Terraria already has one)
+  5. Add ***ALL*** of your mods to the local folder (Your mod folder may be different if you are using the preview)
+     1. MacOS
+     ```~/Library/Application Support/Terraria/tModLoader/Mods```
+     2. Windows
+     ```C:\Users\{YOUR USERNAME}\Documents\My Games\Terraria\tModLoader\Mods```
+  6. In each instance, enable the mods you want.
+  7. Run the app and click launch on the instance!
 
 ***
 
@@ -102,7 +109,7 @@
 2. ```cd TerrariaLauncher```
 3. ```mkdir app_build app_jar```
 4. Compile th jar
-   1. In PowerShell: ```./gradlew shadowJar```
+   1. In PowerShell: ```.\gradlew shadowJar```
    2. In Cmd Prompt: ```gradlew shadowJar```
 5. ```copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar```
 6. Copy this and change the version number, then run it
