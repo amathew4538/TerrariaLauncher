@@ -4,107 +4,166 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.io.File;
-import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Enumeration;
 
 public class LauncherUtils {
+    private static JTextArea debugTextArea;
+
+    private static void log(String message) {
+        System.out.println(message);
+        if (debugTextArea != null) {
+            SwingUtilities.invokeLater(() -> {
+                debugTextArea.append(message + "\n");
+                debugTextArea.setCaretPosition(debugTextArea.getDocument().getLength());
+            });
+        }
+    }
+
+    public static void initDebugWindow() {
+        JFrame frame = new JFrame("Launcher Debug Log");
+        frame.setSize(500, 400);
+        debugTextArea = new JTextArea();
+        debugTextArea.setBackground(Color.BLACK);
+        debugTextArea.setForeground(Color.GREEN);
+        debugTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        debugTextArea.setEditable(false);
+        frame.add(new JScrollPane(debugTextArea));
+        frame.setVisible(true);
+        log("--- Debug Window Initialized ---");
+    }
+
     public static String getAppVersion() {
         String version = LauncherUtils.class.getPackage().getImplementationVersion();
         return (version != null) ? version : "Dev-Build";
     }
 
-    public static void setUIFont(Font f) {
-        Enumeration<Object> keys = UIManager.getDefaults().keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            if (UIManager.get(key) instanceof FontUIResource) {
-                UIManager.put(key, f);
-            }
-        }
-    }
-
-    public static String formatFolderName(String name) {
-        if (name == null || name.isEmpty()) return name;
-        String result = name.replaceAll("([a-z])([A-Z])", "$1 $2");
-        return result.substring(0, 1).toUpperCase() + result.substring(1);
-    }
-
     public static void launchInstance(Path path) {
+        initDebugWindow();
         String os = System.getProperty("os.name").toLowerCase();
         File folder = path.toFile();
+        log("Starting launch for: " + folder.getName());
 
         if (folder.getName().equalsIgnoreCase("TerrariaLauncher.app") ||
             folder.getName().equalsIgnoreCase("iTerm.app")) {
+            log("Error: Targeting launcher or iTerm. Aborting.");
             return;
         }
-    
+
         ProcessBuilder pb = new ProcessBuilder();
         pb.directory(folder);
-    
+
         try {
             if (os.contains("win")) {
+                log("Platform: Windows detected.");
                 String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
                 pb.command("cmd", "/c", "start", cmd);
                 pb.start();
             } else if (os.contains("mac")) {
+                log("Platform: macOS detected.");
                 File script = new File(folder, "start-tmodloader.sh");
+
                 if (script.exists()) {
+                    log("Found tModLoader script. Preparing iTerm...");
                     script.setExecutable(true);
 
-                    String jarPath = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-                    File bundleDir = new File(jarPath).getParentFile().getParentFile().getParentFile().getParentFile();
-                    File iTerm = new File(bundleDir, "iTerm.app");
+                    String rawJarPath = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+                    String jarPath = URLDecoder.decode(rawJarPath, StandardCharsets.UTF_8.name());
 
-                    // Removed 'disown' to ensure terminal stability during arch swap
-                    String shellCmd = "cd \"" + folder.getAbsolutePath() + "\" && ./start-tmodloader.sh && exit";
-                
+                    File current = new File(jarPath);
+                    while (current != null && !current.getName().endsWith(".app")) {
+                        current = current.getParentFile();
+                    }
+
+                    File parentDir = (current != null) ? current.getParentFile() : new File(".");
+                    File iTerm = new File(parentDir, "iTerm.app");
+
+                    String shellCmd = String.format(
+                        "cd '%s' && ./start-tmodloader.sh & " +
+                        "echo 'Launcher: Waiting for game window...' && " +
+                        "sleep 5 && " +
+                        "tail -f tModLoader-Logs/client.log | grep -m 1 'Device Created' && " +
+                        "echo 'Launcher: Game initialized. Closing terminal...' && sleep 2 && exit",
+                        folder.getAbsolutePath());
+
                     if (iTerm.exists()) {
-                        String[] launchCmd = {
-                            "osascript", "-e",
-                            "tell application \"" + iTerm.getAbsolutePath() + "\"\n" +
+                        log("iTerm.app FOUND. Sending Single-Window AppleScript...");
+                        String appleScript = String.format(
+                            "tell application \"%s\"\n" +
                             "    activate\n" +
-                            "    create window with default profile\n" +
+                            "    if (count windows) = 0 then\n" +
+                            "        create window with default profile\n" +
+                            "    end if\n" +
+                            "    delay 0.5\n" +
                             "    tell current session of current window\n" +
-                            "        write text \"" + shellCmd + "\"\n" +
+                            "        write text \"%s\"\n" +
                             "    end tell\n" +
-                            "end tell"
-                        };
-                        pb.command(launchCmd);
+                            "end tell", iTerm.getAbsolutePath(), shellCmd);
+
+                        pb.command("osascript", "-e", appleScript);
                     } else {
+                        log("iTerm.app NOT FOUND. Using Terminal.app fallback.");
                         pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
                     }
+
+                    pb.start();
+                    log("Process started successfully.");
+                } else if (folder.getName().endsWith(".app")) {
+                    log("Base App detected. Using 'open' command.");
+                    pb.command("open", "-a", folder.getAbsolutePath());
                     pb.start();
                 }
             }
 
-            // Watcher Thread with 5-second Grace Period
+            // WATCHER THREAD: Closes the Java Launcher UI
             new Thread(() -> {
                 try {
-                    Thread.sleep(5000); // Wait for script to initialize and swap architectures
-                    int secondsWaited = 0;
-                    while (secondsWaited < 120) { // 2 minute timeout
+                    log("Watcher: Monitoring for game process (max 60s)...");
+                    boolean gameStarted = false;
+                    for (int i = 0; i < 60; i++) {
                         if (isGameRunning()) {
-                            Thread.sleep(2000); 
-                            System.exit(0);
+                            gameStarted = true;
+                            log("Watcher: Game process DETECTED!");
+                            break;
                         }
                         Thread.sleep(1000);
-                        secondsWaited++;
+                    }
+
+                    if (gameStarted) {
+                        // We wait 10 seconds to ensure iTerm has finished its 'grep' and exited first
+                        log("Watcher: Game confirmed. Closing Launcher in 10s...");
+                        Thread.sleep(10000);
+                        System.exit(0);
+                    } else {
+                        log("Watcher: Game not detected within 60s. Keeping launcher open.");
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log("Watcher Error: " + e.getMessage());
                 }
             }).start();
-        
+
         } catch (Exception e) {
-            e.printStackTrace();
+            log("CRITICAL ERROR: " + e.getMessage());
             JOptionPane.showMessageDialog(null, "Launch Error: " + e.getMessage());
         }
     }
 
+    public static boolean isGameRunning() {
+        return ProcessHandle.allProcesses().anyMatch(process -> {
+            String info = process.info().command().orElse("").toLowerCase();
+            // Filter out the launcher and terminal to avoid false positives
+            if (info.contains("terrarialauncher") || info.contains("iterm") || info.contains("terminal")) return false;
+
+            boolean match = info.contains("dotnet") || info.contains("tmodloader") || info.contains("terraria");
+            if (match) log("Matched Process: " + info);
+            return match;
+        });
+    }
+
     public static void scanAndPopulate(JPanel container, File rootDir) {
         container.removeAll();
-
         String os = System.getProperty("os.name").toLowerCase();
         String baseName = os.contains("win") ? "Terraria.exe" : "Terraria.app";
 
@@ -117,13 +176,10 @@ public class LauncherUtils {
         File[] files = rootDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                String name = file.getName();
-
                 if (!file.isDirectory()) continue;
-                if (name.startsWith(".") || name.equals("app") || name.equals("dist")) continue;
-                if (name.equals(baseName)) continue;
-                if (name.contains("TerrariaLauncher")) continue;
-                if (name.contains("iTerm")) continue;
+                String name = file.getName();
+                if (name.startsWith(".") || name.equals("app") || name.equals("dist") || name.equals(baseName) 
+                    || name.contains("TerrariaLauncher") || name.contains("iTerm")) continue;
 
                 container.add(new InstanceRow(name, file.toPath(), false));
                 container.add(Box.createVerticalStrut(10));
@@ -133,39 +189,19 @@ public class LauncherUtils {
         container.repaint();
     }
 
-    public static boolean isGameRunning() {
-        return ProcessHandle.allProcesses().anyMatch(process -> {
-            String info = process.info().command().orElse("").toLowerCase();
-            return info.contains("dotnet") || info.contains("tmodloader") || info.contains("terraria");
-        });
+    public static String formatFolderName(String name) {
+        if (name == null || name.isEmpty()) return name;
+        String result = name.replaceAll("([a-z])([A-Z])", "$1 $2");
+        return result.substring(0, 1).toUpperCase() + result.substring(1);
     }
-    
-    public static void showLogWindow(InputStream inputStream) {
-        JFrame logFrame = new JFrame("TModLoader Console Log");
-        logFrame.setSize(600, 400);
-        JTextArea textArea = new JTextArea();
-        textArea.setBackground(new Color(30, 30, 30));
-        textArea.setForeground(Color.GREEN);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        textArea.setEditable(false);
 
-        logFrame.add(new JScrollPane(textArea));
-        logFrame.setVisible(true);
-
-        new Thread(() -> {
-            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream))) {
-                String line;
-                // readLine() is more reliable for streaming shell outputs than Scanner.hasNextLine()
-                while ((line = reader.readLine()) != null) {
-                    final String capturedLine = line;
-                    SwingUtilities.invokeLater(() -> {
-                        textArea.append(capturedLine + "\n");
-                        textArea.setCaretPosition(textArea.getDocument().getLength());
-                    });
-                }
-            } catch (java.io.IOException e) {
-                SwingUtilities.invokeLater(() -> textArea.append("--- Stream Closed ---\n"));
+    public static void setUIFont(Font f) {
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            if (UIManager.get(key) instanceof FontUIResource) {
+                UIManager.put(key, f);
             }
-        }).start();
+        }
     }
 }
