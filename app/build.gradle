@@ -44,3 +44,14 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+def versionStr = System.getenv("APP_VERSION") ?: "1.0.0"
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Version': versionStr,
+            'Main-Class': 'TerrariaLauncher.TerrariaLauncher'
+        )
+    }
+}

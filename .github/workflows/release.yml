@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: write      
+  contents: write
 
 jobs:
   build-macos:
@@ -14,6 +14,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,6 +27,8 @@ jobs:
 
       - name: Build ShadowJar
         run: ./gradlew shadowJar
+        env:
+          APP_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
       - name: Prepare jpackage input
         run: |
@@ -34,18 +40,18 @@ jobs:
           jpackage --type app-image \
             --dest app_build \
             --name "TerrariaLauncher" \
+            --app-version ${{ steps.get_version.outputs.VERSION }} \
             --input app_jar/ \
             --main-jar TerrariaLauncher.jar \
             --main-class TerrariaLauncher.TerrariaLauncher \
             --icon package-resources/icon.icns
 
-      - name: Download and Bundle iTerm2
+      - name: Bundle iTerm2
         run: |
-          # Downloading specific version to ensure binary integrity
           curl -L -f "https://iterm2.com/downloads/stable/iTerm2-3_6_9.zip" -o iterm.zip
           unzip iterm.zip -d app_build/
 
-      - name: Create FixPermissions Script
+      - name: Create FixPermissions
         run: |
           cat <<EOF > app_build/FixPermissions.command
           #!/bin/bash
@@ -56,7 +62,7 @@ jobs:
           EOF
           chmod +x app_build/FixPermissions.command
 
-      - name: Package Release ZIP
+      - name: Package macOS ZIP
         run: |
           cd app_build
           zip -r ../TerrariaLauncher-macOS.zip TerrariaLauncher.app iTerm.app FixPermissions.command
@@ -74,6 +80,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -82,6 +93,8 @@ jobs:
 
       - name: Build ShadowJar
         run: .\gradlew shadowJar
+        env:
+          APP_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
       - name: Prepare jpackage input
         run: |
@@ -93,6 +106,7 @@ jobs:
           jpackage --type app-image `
             --dest app_build `
             --name "TerrariaLauncher" `
+            --app-version ${{ steps.get_version.outputs.VERSION }} `
             --input app_jar/ `
             --main-jar TerrariaLauncher.jar `
             --main-class TerrariaLauncher.TerrariaLauncher `

@@ -9,6 +9,10 @@ import java.nio.file.Path;
 import java.util.Enumeration;
 
 public class LauncherUtils {
+    public static String getAppVersion() {
+        String version = LauncherUtils.class.getPackage().getImplementationVersion();
+        return (version != null) ? version : "Dev-Build";
+    }
 
     public static void setUIFont(Font f) {
         Enumeration<Object> keys = UIManager.getDefaults().keys();
@@ -25,11 +29,13 @@ public class LauncherUtils {
         String result = name.replaceAll("([a-z])([A-Z])", "$1 $2");
         return result.substring(0, 1).toUpperCase() + result.substring(1);
     }
+
     public static void launchInstance(Path path) {
         String os = System.getProperty("os.name").toLowerCase();
         File folder = path.toFile();
 
-        if (folder.getName().equals("TerrariaLauncher.app") || folder.getName().equals("iTerm.app")) {
+        if (folder.getName().equalsIgnoreCase("TerrariaLauncher.app") ||
+            folder.getName().equalsIgnoreCase("iTerm.app")) {
             return;
         }
     
@@ -40,41 +46,56 @@ public class LauncherUtils {
             if (os.contains("win")) {
                 String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
                 pb.command("cmd", "/c", "start", cmd);
+                pb.start();
             } else if (os.contains("mac")) {
                 File script = new File(folder, "start-tmodloader.sh");
                 if (script.exists()) {
                     script.setExecutable(true);
-                
-                    // Find iTerm.app sitting next to TerrariaLauncher.app
+
                     String jarPath = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
                     File bundleDir = new File(jarPath).getParentFile().getParentFile().getParentFile().getParentFile();
                     File iTerm = new File(bundleDir, "iTerm.app");
+
+                    // Removed 'disown' to ensure terminal stability during arch swap
+                    String shellCmd = "cd \"" + folder.getAbsolutePath() + "\" && ./start-tmodloader.sh && exit";
                 
                     if (iTerm.exists()) {
-                        // We use osascript to tell iTerm to stay open and run the command
                         String[] launchCmd = {
                             "osascript", "-e",
                             "tell application \"" + iTerm.getAbsolutePath() + "\"\n" +
                             "    activate\n" +
                             "    create window with default profile\n" +
                             "    tell current session of current window\n" +
-                            "        write text \"cd \\\"" + folder.getAbsolutePath() + "\\\" && ./start-tmodloader.sh\"\n" +
+                            "        write text \"" + shellCmd + "\"\n" +
                             "    end tell\n" +
                             "end tell"
                         };
                         pb.command(launchCmd);
                     } else {
-                        // Fallback to native Terminal
-                        pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"cd '" + folder.getAbsolutePath() + "' && ./start-tmodloader.sh\"");
+                        pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
                     }
                     pb.start();
-                    return;
                 }
             }
+
+            // Watcher Thread with 5-second Grace Period
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000); // Wait for script to initialize and swap architectures
+                    int secondsWaited = 0;
+                    while (secondsWaited < 120) { // 2 minute timeout
+                        if (isGameRunning()) {
+                            Thread.sleep(2000); 
+                            System.exit(0);
+                        }
+                        Thread.sleep(1000);
+                        secondsWaited++;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
         
-            if (!pb.command().isEmpty()) {
-                pb.start();
-            }
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Launch Error: " + e.getMessage());
@@ -111,6 +132,14 @@ public class LauncherUtils {
         container.revalidate();
         container.repaint();
     }
+
+    public static boolean isGameRunning() {
+        return ProcessHandle.allProcesses().anyMatch(process -> {
+            String info = process.info().command().orElse("").toLowerCase();
+            return info.contains("dotnet") || info.contains("tmodloader") || info.contains("terraria");
+        });
+    }
+    
     public static void showLogWindow(InputStream inputStream) {
         JFrame logFrame = new JFrame("TModLoader Console Log");
         logFrame.setSize(600, 400);
