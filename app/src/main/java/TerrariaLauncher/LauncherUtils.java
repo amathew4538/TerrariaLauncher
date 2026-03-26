@@ -11,8 +11,27 @@ import java.util.Enumeration;
 
 public class LauncherUtils {
     private static JTextArea debugTextArea;
+    private static final boolean IS_DEBUG = checkDebugStatus();
+
+    private static boolean checkDebugStatus() {
+        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
+            java.util.Properties prop = new java.util.Properties();
+            if (input == null) return true; // Default to debug if file is missing
+
+            prop.load(input);
+            String buildType = prop.getProperty("build.type");
+            
+            // If the variable hasn't been replaced, it will still look like "${build.type}"
+            // We only return false if it is explicitly set to "release"
+            return !"release".equalsIgnoreCase(buildType);
+        } catch (Exception ex) {
+            return true; 
+        }
+    }
 
     private static void log(String message) {
+        if (!IS_DEBUG) return;
+
         System.out.println(message);
         if (debugTextArea != null) {
             SwingUtilities.invokeLater(() -> {
@@ -23,6 +42,8 @@ public class LauncherUtils {
     }
 
     public static void initDebugWindow() {
+        if (!IS_DEBUG) return;
+
         JFrame frame = new JFrame("Launcher Debug Log");
         frame.setSize(500, 400);
         debugTextArea = new JTextArea();

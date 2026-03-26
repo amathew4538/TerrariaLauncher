@@ -5,6 +5,7 @@
 build
 app_build
 app_jar
+bin
 
 # Ignore Kotlin plugin data
 .kotlin

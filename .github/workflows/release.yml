@@ -25,6 +25,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set Build Type to Release
+        run: |
+          sed -i 's/${build.type}/release/g' src/main/resources/config.properties
+
       - name: Build ShadowJar
         run: ./gradlew shadowJar
         env:
@@ -90,6 +94,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Set Build Type to Release (Windows)
+        run: |
+          (Get-Content src/main/resources/config.properties) -replace '\$\{build.type\}', 'release' | Set-Content src/main/resources/config.properties
+        shell: powershell
 
       - name: Build ShadowJar
         run: .\gradlew shadowJar
