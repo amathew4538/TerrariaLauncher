@@ -38,7 +38,8 @@ jobs:
 
       - name: Download and Bundle iTerm2
         run: |
-          curl -L https://iterm2.com/downloads/stable/latest.zip -o iterm.zip
+          # Downloading specific version to ensure binary integrity
+          curl -L -f "https://iterm2.com/downloads/stable/iTerm2-3_6_9.zip" -o iterm.zip
           unzip iterm.zip -d app_build/
 
       - name: Create FixPermissions Script
@@ -79,10 +80,13 @@ jobs:
       - name: Build ShadowJar
         run: .\gradlew shadowJar
 
-      - name: Create App Image
+      - name: Prepare jpackage input
         run: |
           mkdir app_jar
           copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar
+
+      - name: Create App Image
+        run: |
           jpackage --type app-image `
             --dest app_build `
             --name "TerrariaLauncher" `
