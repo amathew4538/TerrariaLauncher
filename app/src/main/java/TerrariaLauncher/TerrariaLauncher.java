@@ -16,7 +16,7 @@ public class TerrariaLauncher {
             if (path.contains(".app")) {
                 runningLocation = jarFile.getParentFile().getParentFile().getParentFile().getParentFile();
             } else {
-                runningLocation = new File("."); // Fallback for IDE testing
+                runningLocation = new File(".");
             }
         } catch (Exception e) {
             runningLocation = new File(".");
@@ -93,15 +93,28 @@ public class TerrariaLauncher {
         JButton quitBtn = new JButton("Quit");
         quitBtn.setPreferredSize(new Dimension(200, 50));
         quitBtn.addActionListener(e -> System.exit(0));
-        JPanel bottomPanel = new JPanel();
+
+        String currentVersion = LauncherUtils.getAppVersion();
+
+        JLabel versionLabel = new JLabel("v" + currentVersion + " ");
+        versionLabel.setForeground(new Color(255, 255, 255, 255));
+        versionLabel.setFont(versionLabel.getFont().deriveFont(24f));
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setOpaque(false);
-        bottomPanel.add(quitBtn);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+
+        JPanel btnWrapper = new JPanel();
+        btnWrapper.setOpaque(false);
+        btnWrapper.add(quitBtn);
+
+        bottomPanel.add(btnWrapper, BorderLayout.CENTER);
+        bottomPanel.add(versionLabel, BorderLayout.EAST);
+
         bgPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
-
-        String currentVersion = LauncherUtils.getAppVersion();
 
         if (!currentVersion.equals("Dev-Build")) {
             AutoUpdate.checkForUpdates(currentVersion);
