@@ -22,7 +22,7 @@ public class TerrariaLauncher {
             runningLocation = new File(".");
         }
 
-    final File finalLocation = runningLocation;
+        final File finalLocation = runningLocation;
 
         try {
             UIManager.setLookAndFeel(new FlatMacDarkLaf());
@@ -100,5 +100,13 @@ public class TerrariaLauncher {
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
+
+        String currentVersion = LauncherUtils.getAppVersion();
+
+        if (!currentVersion.equals("Dev-Build")) {
+            AutoUpdate.checkForUpdates(currentVersion);
+        } else {
+            System.out.println("Running in Dev Mode: Skipping Auto-Update.");
+        }
     }
 }

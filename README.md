@@ -30,7 +30,7 @@
    ### ***NOTE: Your folder names must be in camelCase***
    1. MacOS:
     ```bash
-    .
+    ~/Applications/
     └── Terraria/
         ├── TerrariaLauncher.app
         ├── iTerm.app
@@ -53,7 +53,7 @@
     ```
     2. Windows:
     ```bash
-    .
+    C:/Users/{YOUR USERNAME}/Documents/
     └── Terraria/
         ├── TerrariaLauncher.exe
         ├── Terraria.exe

@@ -25,9 +25,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set Build Type to Release
+      - name: Set Build Type and Version
         run: |
           sed -i '' 's|\${build.type}|release|g' app/src/main/resources/config.properties
+          sed -i '' 's|\${version}|${{ steps.get_version.outputs.VERSION }}|g' app/src/main/resources/config.properties
 
       - name: Build ShadowJar
         run: ./gradlew shadowJar
@@ -52,7 +53,7 @@ jobs:
 
       - name: Bundle iTerm2
         run: |
-          curl -L -f "https://iterm2.com/downloads/stable/iTerm2-3_6_9.zip" -o iterm.zip
+          curl -L -f "https://iterm2.com/downloads/stable/latest" -o iterm.zip
           unzip iterm.zip -d app_build/
 
       - name: Create FixPermissions
@@ -95,10 +96,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set Build Type to Release (Windows)
-        run: |
-          (Get-Content app/src/main/resources/config.properties) -replace '\$\{build.type\}', 'release' | Set-Content app/src/main/resources/config.properties
+      - name: Set Build Type and Version (Windows)
         shell: powershell
+        run: |
+          $val = "${{ steps.get_version.outputs.VERSION }}"
+          $path = "app/src/main/resources/config.properties"
+          (Get-Content $path) -replace '\$\{build.type\}', 'release' -replace '\$\{version\}', $val | Set-Content $path
 
       - name: Build ShadowJar
         run: .\gradlew shadowJar

@@ -20,7 +20,7 @@ public class LauncherUtils {
 
             prop.load(input);
             String buildType = prop.getProperty("build.type");
-            
+
             // If the variable hasn't been replaced, it will still look like "${build.type}"
             // We only return false if it is explicitly set to "release"
             return !"release".equalsIgnoreCase(buildType);
@@ -57,8 +57,20 @@ public class LauncherUtils {
     }
 
     public static String getAppVersion() {
-        String version = LauncherUtils.class.getPackage().getImplementationVersion();
-        return (version != null) ? version : "Dev-Build";
+        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
+            java.util.Properties prop = new java.util.Properties();
+            if (input == null) return "Dev-Build";
+        
+            prop.load(input);
+            String version = prop.getProperty("version");
+        
+            // Handle the case where the placeholder ${version} hasn't been replaced yet
+            if (version == null || version.contains("${")) return "Dev-Build";
+        
+            return version;
+        } catch (Exception ex) {
+            return "Dev-Build";
+        }
     }
 
     public static void launchInstance(Path path) {
