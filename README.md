@@ -54,6 +54,7 @@
         │   │   ├── ScriptCaller.sh
         │   │   └── ...
         │   ├── icon.png
+        │   ├── enabled.json
         │   └── ...
         └── ...
     ```
@@ -78,6 +79,7 @@
         │   │   ├── ScriptCaller.bat
         │   │   └── ...
         │   ├── icon.png
+        │   ├── enabled.json
         │   └── ...
         └── ...
     ```
@@ -88,7 +90,7 @@
     ```~/Library/Application Support/Terraria/tModLoader-preview/Mods```
     2. Windows
     ```C:\Users\{YOUR USERNAME}\Documents\My Games\Terraria\tModLoader\Mods```
-6. In each instance, enable the mods you want.
+6. In each instance, enable the mods you want. (Enabled mods will be managed by the app)
 7. Run the app and click launch on the instance!
 
 ***
@@ -123,7 +125,7 @@
 1. ```git clone https://github.com/amathew4538/TerrariaLauncher.git```
 2. ```cd TerrariaLauncher```
 3. ```mkdir app_build app_jar```
-4. Compile th jar
+4. Compile the jar
    1. In PowerShell: ```.\gradlew shadowJar```
    2. In Cmd Prompt: ```gradlew shadowJar```
 5. ```copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar```
