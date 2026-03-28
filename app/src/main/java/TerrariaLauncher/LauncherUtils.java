@@ -10,78 +10,17 @@ import java.nio.file.Path;
 import java.util.Enumeration;
 
 public class LauncherUtils {
-    private static JTextArea debugTextArea;
-    private static final boolean IS_DEBUG = checkDebugStatus();
-
-    private static boolean checkDebugStatus() {
-        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            java.util.Properties prop = new java.util.Properties();
-            if (input == null) return true; // Default to debug if file is missing
-
-            prop.load(input);
-            String buildType = prop.getProperty("build.type");
-
-            // If the variable hasn't been replaced, it will still look like "${build.type}"
-            // We only return false if it is explicitly set to "release"
-            return !"release".equalsIgnoreCase(buildType);
-        } catch (Exception ex) {
-            return true; 
-        }
-    }
-
-    private static void log(String message) {
-        if (!IS_DEBUG) return;
-
-        System.out.println(message);
-        if (debugTextArea != null) {
-            SwingUtilities.invokeLater(() -> {
-                debugTextArea.append(message + "\n");
-                debugTextArea.setCaretPosition(debugTextArea.getDocument().getLength());
-            });
-        }
-    }
-
-    public static void initDebugWindow() {
-        if (!IS_DEBUG) return;
-
-        JFrame frame = new JFrame("Launcher Debug Log");
-        frame.setSize(500, 400);
-        debugTextArea = new JTextArea();
-        debugTextArea.setBackground(Color.BLACK);
-        debugTextArea.setForeground(Color.GREEN);
-        debugTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        debugTextArea.setEditable(false);
-        frame.add(new JScrollPane(debugTextArea));
-        frame.setVisible(true);
-        log("--- Debug Window Initialized ---");
-    }
-
-    public static String getAppVersion() {
-        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            java.util.Properties prop = new java.util.Properties();
-            if (input == null) return "Dev-Build";
-        
-            prop.load(input);
-            String version = prop.getProperty("version");
-        
-            // Handle the case where the placeholder ${version} hasn't been replaced yet
-            if (version == null || version.contains("${")) return "Dev-Build";
-        
-            return version;
-        } catch (Exception ex) {
-            return "Dev-Build";
-        }
-    }
-
     public static void launchInstance(Path path) {
-        initDebugWindow();
+        DebugLogger.initDebugWindow();
         String os = System.getProperty("os.name").toLowerCase();
         File folder = path.toFile();
-        log("Starting launch for: " + folder.getName());
+        DebugLogger.log("Starting launch for: " + folder.getName());
+
+        ModCache.loadInstanceMods(folder);
 
         if (folder.getName().equalsIgnoreCase("TerrariaLauncher.app") ||
             folder.getName().equalsIgnoreCase("iTerm.app")) {
-            log("Error: Targeting launcher or iTerm. Aborting.");
+            DebugLogger.log("Error: Targeting launcher or iTerm. Aborting.");
             return;
         }
 
@@ -90,16 +29,16 @@ public class LauncherUtils {
 
         try {
             if (os.contains("win")) {
-                log("Platform: Windows detected.");
+                DebugLogger.log("Platform: Windows detected.");
                 String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
                 pb.command("cmd", "/c", "start", cmd);
                 pb.start();
             } else if (os.contains("mac")) {
-                log("Platform: macOS detected.");
+                DebugLogger.log("Platform: macOS detected.");
                 File script = new File(folder, "start-tmodloader.sh");
 
                 if (script.exists()) {
-                    log("Found tModLoader script. Preparing iTerm...");
+                    DebugLogger.log("Found tModLoader script. Preparing iTerm...");
                     script.setExecutable(true);
 
                     String rawJarPath = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -122,7 +61,7 @@ public class LauncherUtils {
                         folder.getAbsolutePath());
 
                     if (iTerm.exists()) {
-                        log("iTerm.app FOUND. Sending Single-Window AppleScript...");
+                        DebugLogger.log("iTerm.app FOUND. Sending Single-Window AppleScript...");
                         String appleScript = String.format(
                             "tell application \"%s\"\n" +
                             "    activate\n" +
@@ -137,14 +76,14 @@ public class LauncherUtils {
 
                         pb.command("osascript", "-e", appleScript);
                     } else {
-                        log("iTerm.app NOT FOUND. Using Terminal.app fallback.");
+                        DebugLogger.log("iTerm.app NOT FOUND. Using Terminal.app fallback.");
                         pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
                     }
 
                     pb.start();
-                    log("Process started successfully.");
+                    DebugLogger.log("Process started successfully.");
                 } else if (folder.getName().endsWith(".app")) {
-                    log("Base App detected. Using 'open' command.");
+                    DebugLogger.log("Base App detected. Using 'open' command.");
                     pb.command("open", "-a", folder.getAbsolutePath());
                     pb.start();
                 }
@@ -153,32 +92,56 @@ public class LauncherUtils {
             // WATCHER THREAD: Closes the Java Launcher UI
             new Thread(() -> {
                 try {
-                    log("Watcher: Monitoring for game process (max 60s)...");
+                    DebugLogger.log("Watcher: Monitoring for game process (max 60s)...");
                     boolean gameStarted = false;
                     for (int i = 0; i < 60; i++) {
                         if (isGameRunning()) {
                             gameStarted = true;
-                            log("Watcher: Game process DETECTED!");
+                            DebugLogger.log("Watcher: Game process DETECTED!");
                             break;
                         }
                         Thread.sleep(1000);
                     }
 
                     if (gameStarted) {
-                        // We wait 10 seconds to ensure iTerm has finished its 'grep' and exited first
-                        log("Watcher: Game confirmed. Closing Launcher in 10s...");
-                        Thread.sleep(10000);
+                        DebugLogger.log("Watcher: Game confirmed. iTerm will be closed in 15 seconds...");
+
+                        // Start a separate mini-thread to kill iTerm after 15 seconds
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(15000); // Wait 15 seconds
+                                DebugLogger.log("Watcher: 15s elapsed. Sending quit command to iTerm...");
+                            
+                                // Use osascript to tell iTerm to quit gracefully
+                                String closeScript = "tell application \"iTerm\" to quit";
+                                new ProcessBuilder("osascript", "-e", closeScript).start();
+                            } catch (Exception e) {
+                                DebugLogger.log("Watcher Error (iTerm Close): " + e.getMessage());
+                            }
+                        }).start();
+                    
+                        // Continue monitoring for game exit to save mods
+                        DebugLogger.log("Watcher: Monitoring for game exit to save mods...");
+                        while (isGameRunning()) {
+                            Thread.sleep(2000);
+                        }
+                    
+                        DebugLogger.log("Watcher: Game exit detected. Saving Mod Cache...");
+                        ModCache.saveInstanceMods(folder);
+                    
+                        DebugLogger.log("Watcher: Closing Launcher in 3s...");
+                        Thread.sleep(3000);
                         System.exit(0);
                     } else {
-                        log("Watcher: Game not detected within 60s. Keeping launcher open.");
+                        DebugLogger.log("Watcher: Game not detected within 60s. Keeping launcher open.");
                     }
                 } catch (Exception e) {
-                    log("Watcher Error: " + e.getMessage());
+                    DebugLogger.log("Watcher Error: " + e.getMessage());
                 }
             }).start();
 
         } catch (Exception e) {
-            log("CRITICAL ERROR: " + e.getMessage());
+            DebugLogger.log("CRITICAL ERROR: " + e.getMessage());
             JOptionPane.showMessageDialog(null, "Launch Error: " + e.getMessage());
         }
     }
@@ -190,7 +153,7 @@ public class LauncherUtils {
             if (info.contains("terrarialauncher") || info.contains("iterm") || info.contains("terminal")) return false;
 
             boolean match = info.contains("dotnet") || info.contains("tmodloader") || info.contains("terraria");
-            if (match) log("Matched Process: " + info);
+            if (match) DebugLogger.log("Matched Process: " + info);
             return match;
         });
     }

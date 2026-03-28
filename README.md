@@ -1,4 +1,4 @@
-# Teraria Launcher v1.0.11: A tModLoader Instance Manager
+# Teraria Launcher v1.0.12: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -26,11 +26,15 @@
 ***
 
 ## How to use
+
 1. Download the app from [Releases](https://github.com/amathew4538/TerrariaLauncher/releases/latest)
-2. Obtain a tmodloader instance from their [Github](https://github.com/tModLoader/tModLoader/releases/latest)
+2. Obtain a tmodloader ***PREVIEW*** instance from their [Github](https://github.com/tModLoader/tModLoader/releases/latest)
 3. Setup your folders like this:
+
    ### ***NOTE: Your folder names must be in camelCase***
-   1. MacOS:
+
+    1. MacOS:
+
     ```bash
     ~/Applications/
     └── Terraria/
@@ -53,7 +57,9 @@
         │   └── ...
         └── ...
     ```
+
     2. Windows:
+
     ```bash
     C:/Users/{YOUR USERNAME}/Documents/
     └── Terraria/
@@ -75,25 +81,29 @@
         │   └── ...
         └── ...
     ```
-  4. Add an `icon.png` to every folder (base Terraria already has one)
-  5. Add ***ALL*** of your mods to the local folder (Your mod folder may be different if you are using the preview)
-     1. MacOS
-     ```~/Library/Application Support/Terraria/tModLoader/Mods```
-     2. Windows
-     ```C:\Users\{YOUR USERNAME}\Documents\My Games\Terraria\tModLoader\Mods```
-  6. In each instance, enable the mods you want.
-  7. Run the app and click launch on the instance!
+
+4. Add an `icon.png` to every folder (base Terraria already has one)
+5. Add ***ALL*** of your mods to the local folder
+    1. MacOS
+    ```~/Library/Application Support/Terraria/tModLoader-preview/Mods```
+    2. Windows
+    ```C:\Users\{YOUR USERNAME}\Documents\My Games\Terraria\tModLoader\Mods```
+6. In each instance, enable the mods you want.
+7. Run the app and click launch on the instance!
 
 ***
 
 ## How to build
+
 ### MacOS
+
 1. ```git clone https://github.com/amathew4538/TerrariaLauncher.git```
 2. ```cd TerrariaLauncher```
 3. ```mkdir app_build app_jar```
 4. ```./gradlew shadowJar```
 5. ```cp app/build/libs/app-all.jar app_jar/TerrariaLauncher.jar```
 6. Copy this and change the version number, then run it
+
    ```bash
    jpackage --type app-image \
     --dest app_build \
@@ -104,9 +114,12 @@
     --main-class TerrariaLauncher.TerrariaLauncher \
     --icon package-resources/icon.icns
    ```
+
 7. Move your app to the folder with your Terraria instances
 8. Open the app!
-### Windows:
+
+### Windows
+
 1. ```git clone https://github.com/amathew4538/TerrariaLauncher.git```
 2. ```cd TerrariaLauncher```
 3. ```mkdir app_build app_jar```
@@ -115,6 +128,7 @@
    2. In Cmd Prompt: ```gradlew shadowJar```
 5. ```copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar```
 6. Copy this and change the version number, then run it
+
     ```bash
    jpackage --type app-image `
     --dest app_build `
@@ -127,6 +141,7 @@
     --win-shortcut `
     --win-menu
     ```
+
 ***
 
 ## Contributors

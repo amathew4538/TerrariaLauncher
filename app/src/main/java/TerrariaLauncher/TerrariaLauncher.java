@@ -94,7 +94,7 @@ public class TerrariaLauncher {
         quitBtn.setPreferredSize(new Dimension(200, 50));
         quitBtn.addActionListener(e -> System.exit(0));
 
-        String currentVersion = LauncherUtils.getAppVersion();
+        String currentVersion = DebugLogger.getAppVersion();
 
         JLabel versionLabel = new JLabel("v" + currentVersion + " ");
         versionLabel.setForeground(new Color(255, 255, 255, 255));
