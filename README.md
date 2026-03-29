@@ -1,4 +1,4 @@
-# Teraria Launcher v1.1.0: A tModLoader Instance Manager
+# Teraria Launcher v1.1.1: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -160,4 +160,5 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 ## Footnotes
 
 <sup>1</sup> Testers needed. Not confirmed.
+
 <sup>2</sup> Probably coming soon.
