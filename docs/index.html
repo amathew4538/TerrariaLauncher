@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<head>
+    <title>Terraria Launcher</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scroll-background" id="lanternBG"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <img src="images/TerrariaLauncherLogo.png" alt="Launcher Logo">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="https://www.github.com/amathew4538/TerrariaLauncher/releases/latest" target="_blank" rel="noopener noreferrer">DOWNLOAD</a></li>
+                <li><a href="https://github.com/amathew4538/TerrariaLauncher/wiki">DOCS</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="intro-box">
+        <div class="intro-content">
+            <h1 class="intro-title">ONE CLICK. INFINITE CONTROl.</h1>
+            <p class="intro-subtitle">
+                Take total control of your Terraria instances with lightning speed. <br>
+                Manage mods, launch instances, and delete instances all in one <i>light</i> and easy interface.
+            </p>
+        </div>
+    </section>
+
+    <section class="yt-preview-box">
+        <div class="yt-preview-content">
+            <h1 class="yt-preview-title">Youtube Preview</h1>
+            <p class="yt-preview-subtitle">Coming soon!</p>
+        </div>
+    </section>
+
+    <section class="SBS-box">
+        <div class="download-content">
+            <h1 class="download-title">Download the launcher</h1>
+            <a href="https://www.github.com/amathew4538/TerrariaLauncher/releases/latest" target="_blank" rel="noopener noreferrer">
+                <button class="download-button">DOWNLOAD</button>
+            </a>
+        </div>
+
+        <div class="docs-content">
+            <h1 class="docs-title">Read the docs</h1>
+            <a href="https://github.com/amathew4538/TerrariaLauncher/wiki" target="_blank" rel="noopener noreferrer">
+                <button class="docs-button">DOCUMENTATION</button>
+            </a>
+        </div>
+    </section>
+
+    <section class="github-box">
+        <div class="github-content">
+            <h1 class="github-title">It's open-source on Github!</h1>
+            <a href="https://www.github.com/amathew4538/TerrariaLauncher/" target="_blank" rel="noopener noreferrer">
+                <button class="github-button">View on Github</button>
+            </a>
+        </div>
+    </section>
+
+    <script>
+        const bg = document.getElementById('lanternBG');
+        const totalFrames = 96;
+        const columns = 10;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+            if (maxScroll <= 0) return;
+
+            const scrollFraction = scrollTop / maxScroll;
+            const frameIndex = Math.min(
+                totalFrames - 1,
+                Math.floor(scrollFraction * totalFrames)
+            );
+
+            const col = frameIndex % columns;
+            const row = Math.floor(frameIndex / columns);
+
+            bg.style.backgroundPosition = `-${col * 100}vw -${row * 100}vh`;
+        });
+    </script>
+</body>

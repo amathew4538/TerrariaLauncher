@@ -1,0 +1,357 @@
+:root {
+    --bg-dark: #0b0c10;
+    --card-bg: #1f2833;
+    --accent-glow-dark: #795c03;
+    --accent-glow: #d19406;
+    --text-dim: #8b8b8b;
+    --navbar-bkg: #0b0c10f2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--navbar-bkg);
+    width: 100%;
+    overflow-x: hidden; /* Prevents accidental horizontal scrolling */
+    overscroll-behavior-y: none;
+}
+
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 0; /* Adds space at the top and bottom */
+    background: var(--navbar-bkg);
+    border-bottom: 2px solid var(--accent-glow);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+}
+
+.nav-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column; /* This stacks them vertically */
+    align-items: center;    /* This centers them horizontally */
+    gap: 15px;              /* Space between the logo and the links */
+}
+
+.nav-logo img {
+    height: 80px; /* Increased size since it has more room now */
+    filter: drop-shadow(3px 3px 10px var(--accent-glow-dark)); /* Dropshadow for images */
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover Effect */
+.nav-logo img:hover {
+    transform: scale(1.05); /* Subtle grow effect when hovering logo */
+    filter: drop-shadow(5px 5px 10px var(--accent-glow));  /* Drop Shadow bigger */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    gap: 40px; /* Space between buttons */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    transition: 0.3s ease;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* Hover Effect */
+.nav-links a:hover {
+    color: var(--accent-glow);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.intro-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* The dark gradient background */
+    background: linear-gradient(to bottom, #000000, #0b0c10);
+
+    /* The purple/green glowing borders */
+    border-top: 2px solid var(--accent-glow-dark);
+    border-bottom: 2px solid var(--accent-glow-dark);
+
+    /* The outer "bloom" glow for the whole box */
+    box-shadow: 0 0 30px rgba(9, 209, 6, 0.15);
+
+    padding: 80px 80px;
+    margin-top: 160px;
+}
+
+.intro-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow-dark);
+}
+
+.intro-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.intro-subtitle b {
+    color: #ffffff;
+}
+
+.yt-preview-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.yt-preview-content {
+    width: 50%;
+    /* The dark gradient background */
+    background: linear-gradient(to bottom, #000000, #0b0c10);
+
+    /* The yellow-orange glowing borders */
+    border-top: 4px solid var(--accent-glow);
+    border-left: 2px solid;
+    border-right: 2px solid;
+    border-image-source: linear-gradient(to bottom, var(--accent-glow), var(--accent-glow-dark));
+    border-image-slice: 1;
+    border-bottom: 4px solid var(--accent-glow-dark);
+
+    /* The outer bloom glow for the whole box */
+    box-shadow: 0 0 30px rgba(9, 209, 6, 0.15);
+
+    padding: 80px 80px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.yt-preview-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow-dark);
+}
+
+.yt-preview-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.SBS-box {
+    display: flex;
+    justify-content: center; /* Centers the group of boxes */
+    align-items: stretch;    /* Makes both boxes the same height */
+    gap: 20px;               /* Space between the two boxes */
+    padding: 0 20px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.download-content {
+    flex: 1;
+    /* The dark gradient background */
+    background: linear-gradient(to bottom, #000000, #0b0c10);
+
+    /* The yellow-orange glowing borders */
+    border-top: 4px solid var(--accent-glow);
+    border-left: 2px solid;
+    border-right: 2px solid;
+    border-image-source: linear-gradient(to bottom, var(--accent-glow), var(--accent-glow-dark));
+    border-image-slice: 1;
+    border-bottom: 4px solid var(--accent-glow-dark);
+
+    /* The outer bloom glow for the whole box */
+    box-shadow: 0 0 30px rgba(9, 209, 6, 0.15);
+
+    padding: 80px 80px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    display: flex;
+    flex-direction: column; /* Stacks title and button vertically */
+    align-items: center;    /* Centers them horizontally */
+    justify-content: center; /* Centers them vertically if the box is tall */
+    text-align: center;
+}
+
+.download-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 4px;
+    margin-bottom: 30px; /* Space between title and button */
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow-dark);
+}
+
+.download-button {
+    text-decoration: none;
+    padding: 15px 40px;
+    background: var(--accent-glow-dark);
+    color: white;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border: 2px solid var(--accent-glow);
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(209, 148, 6, 0.3);
+}
+
+.download-button:hover {
+    background: var(--accent-glow);
+    color: black;
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: scale(1.05);
+}
+
+.docs-content {
+    flex: 1;
+    /* The dark gradient background */
+    background: linear-gradient(to bottom, #000000, #0b0c10);
+
+    /* The yellow-orange glowing borders */
+    border-top: 4px solid var(--accent-glow);
+    border-left: 2px solid;
+    border-right: 2px solid;
+    border-image-source: linear-gradient(to bottom, var(--accent-glow), var(--accent-glow-dark));
+    border-image-slice: 1;
+    border-bottom: 4px solid var(--accent-glow-dark);
+
+    /* The outer bloom glow for the whole box */
+    box-shadow: 0 0 30px rgba(9, 209, 6, 0.15);
+
+    padding: 80px 80px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    display: flex;
+    flex-direction: column; /* Stacks title and button vertically */
+    align-items: center;    /* Centers them horizontally */
+    justify-content: center; /* Centers them vertically if the box is tall */
+    text-align: center;
+}
+
+.docs-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+    text-align: center;
+}
+
+.docs-button {
+    text-decoration: none;
+    padding: 15px 40px;
+    background: var(--accent-glow-dark);
+    color: white;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border: 2px solid var(--accent-glow);
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(209, 148, 6, 0.3);
+}
+
+.docs-button:hover {
+    background: var(--accent-glow);
+    color: black;
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: scale(1.05);
+}
+
+.github-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* The dark gradient background */
+    background: linear-gradient(to bottom, #000000, #0b0c10);
+
+    /* The purple/green glowing borders */
+    border-top: 2px solid var(--accent-glow);
+    border-bottom: 2px solid var(--accent-glow-dark);
+
+    /* The outer "bloom" glow for the whole box */
+    box-shadow: 0 0 30px rgba(9, 209, 6, 0.15);
+
+    padding: 80px 80px;
+    margin-top: 160px;
+}
+
+.github-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow-dark);
+}
+
+.github-button {
+    text-decoration: none;
+    padding: 15px 40px;
+    background: var(--accent-glow-dark);
+    color: white;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border: 2px solid var(--accent-glow);
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(209, 148, 6, 0.3);
+}
+
+.github-button:hover {
+    background: var(--accent-glow);
+    color: black;
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: scale(1.05);
+}
+
+.scroll-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1;
+    background-image: url('images/lanternBG.png');
+    background-size: 1000% auto; 
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    image-rendering: pixelated; /* Keeps the Terraria pixel look sharp */
+    filter: brightness(0.4);    /* Darker background makes gold text pop */
+}
