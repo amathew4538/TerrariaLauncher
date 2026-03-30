@@ -165,7 +165,8 @@ public class LauncherUtils {
 
         File baseFile = new File(rootDir, baseName);
         if (baseFile.exists()) {
-            container.add(new InstanceRow("Base Terraria", baseFile.toPath(), true));
+            // Pass 'container' and 'rootDir' so the row can trigger a refresh if needed
+            container.add(new InstanceRow("Base Terraria", baseFile.toPath(), true, container, rootDir));
             container.add(Box.createVerticalStrut(10));
         }
 
@@ -177,7 +178,7 @@ public class LauncherUtils {
                 if (name.startsWith(".") || name.equals("app") || name.equals("dist") || name.equals(baseName) 
                     || name.contains("TerrariaLauncher") || name.contains("iTerm")) continue;
 
-                container.add(new InstanceRow(name, file.toPath(), false));
+                container.add(new InstanceRow(name, file.toPath(), false, container, rootDir));
                 container.add(Box.createVerticalStrut(10));
             }
         }
