@@ -1,4 +1,4 @@
-# Teraria Launcher v1.1.1: A tModLoader Instance Manager
+# Teraria Launcher v1.2.0: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -21,8 +21,8 @@
 - It can launch both Base Terraria and any tmodloader instances
 - It caches loaded mods in each instance
 - It currently supports Windows<sup>1</sup> and MacOS
-- It ***DOES NOT*** change active mods in an instance<sup>2</sup>
-- It ***DOES NOT*** delete instances<sup>2</sup>
+- It can change active mods in an instance
+- It can delete instances
 
 ***
 
@@ -159,6 +159,4 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 
 ## Footnotes
 
-<sup>1</sup> Testers needed. Not confirmed.
-
-<sup>2</sup> Probably coming soon.
+<sup>1</sup> Testers and coders needed. Not confirmed.
