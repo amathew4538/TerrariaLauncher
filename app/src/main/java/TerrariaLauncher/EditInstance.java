@@ -51,24 +51,24 @@ public class EditInstance {
                                         .sorted(Comparator.reverseOrder())
                                         .toList();
                 int total = allFiles.size();
-            
+
                 for (int i = 0; i < total; i++) {
                     File file = allFiles.get(i).toFile();
                     String currentName = file.getName();
-                
+
                     // Update UI on the Event Dispatch Thread
                     int progress = (int) (((double) (i + 1) / total) * 100);
                     SwingUtilities.invokeLater(() -> {
                         fileLabel.setText("Deleting: " + currentName);
                         progressBar.setValue(progress);
                     });
-                
+
                     // Small sleep so the user can actually see the files flash by
                     Thread.sleep(10);
-                
+
                     file.delete();
                 }
-            
+
                 // 4. Finalize
                 SwingUtilities.invokeLater(() -> {
                     dialog.dispose();
@@ -76,7 +76,7 @@ public class EditInstance {
                     JOptionPane.showMessageDialog(null, "Instance '" + folderName + "' has been deleted.",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
                 });
-            
+
             } catch (Exception e) {
                 SwingUtilities.invokeLater(() -> {
                     dialog.dispose();
@@ -85,7 +85,7 @@ public class EditInstance {
                 });
             }
         }).start();
-    
+
         dialog.setVisible(true); // Blocks main thread until dialog.dispose() is called
     }
 
@@ -113,7 +113,7 @@ public class EditInstance {
                 try {
                     existingEnabled = Files.readString(enabledFile.toPath());
                 } catch (IOException e) {
-                    DebugLogger.log("EditInstance: Could not read existing enabled.json");
+                    DebugLogger.log("Edit Instance: Could not read existing enabled.json");
                 }
             }
 
@@ -158,7 +158,7 @@ public class EditInstance {
                 JProgressBar progressBar = new JProgressBar(0, 100);
                 progressBar.setIndeterminate(true); // Makes the bar slide back and forth
                 progressBar.setPreferredSize(new Dimension(300, 30));
-                
+
                 loadingDialog.setLayout(new FlowLayout());
                 loadingDialog.add(new JLabel("Applying mod changes..."));
                 loadingDialog.add(progressBar);
@@ -175,7 +175,7 @@ public class EditInstance {
                 
                 timer.setRepeats(false);
                 timer.start();
-                
+
                 loadingDialog.setVisible(true);
             }
         }
@@ -189,7 +189,7 @@ public class EditInstance {
 
             for (int i = 0; i < modList.size(); i++) {
                 writer.write("  \"" + modList.get(i) + "\"");
-            
+
                 // Only add a comma if it is NOT the last item
                 if (i < modList.size() - 1) {
                     writer.write(",");

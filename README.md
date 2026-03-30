@@ -1,4 +1,4 @@
-# Teraria Launcher v1.2.0: A tModLoader Instance Manager
+# Teraria Launcher v1.2.1: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -33,6 +33,8 @@
 3. Setup your folders like this:
 
    ### ***NOTE: Your folder names must be in camelCase***
+
+   ### Don't be alarmed if iTerm.app gets deleted after the first run. That is normal and it doesn't need to be replaced
 
     1. MacOS:
 
@@ -105,13 +107,13 @@
 3. ```mkdir app_build app_jar```
 4. ```./gradlew shadowJar```
 5. ```cp app/build/libs/app-all.jar app_jar/TerrariaLauncher.jar```
-6. Copy this and change the version number, then run it
+6. Copy this (change the version number if you want), then run it
 
    ```bash
    jpackage --type app-image \
     --dest app_build \
     --name "TerrariaLauncher" \
-    --app-version {REPLACE THIS} \
+    --app-version 1.0.0 \
     --input app_jar/ \
     --main-jar TerrariaLauncher.jar \
     --main-class TerrariaLauncher.TerrariaLauncher \
@@ -130,13 +132,13 @@
    1. In PowerShell: ```.\gradlew shadowJar```
    2. In Cmd Prompt: ```gradlew shadowJar```
 5. ```copy app\build\libs\app-all.jar app_jar\TerrariaLauncher.jar```
-6. Copy this and change the version number, then run it
+6. Copy this (change the version number if you want), then run it
 
     ```bash
    jpackage --type app-image `
     --dest app_build `
     --name "TerrariaLauncher" `
-   --app-version {REPLACE THIS} \
+   --app-version 1.0.0 \
     --input app_jar/ `
     --main-jar TerrariaLauncher.jar `
     --main-class TerrariaLauncher.TerrariaLauncher `

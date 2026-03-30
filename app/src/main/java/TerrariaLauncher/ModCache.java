@@ -8,12 +8,12 @@ import java.nio.file.StandardCopyOption;
 public class ModCache {
 
     // The "Global" path where tModLoader actually looks
-    private static final String TMOD_GLOBAL_PATH = System.getProperty("user.home") 
+    private static final String TMOD_GLOBAL_PATH = System.getProperty("user.home")
         + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
 
     /**
      * Swaps the enabled.json from the Instance into the Global folder.
-     * Call this RIGHT BEFORE launching the game.
+     * @apiNote Call this RIGHT BEFORE launching the game.
      */
     public static void loadInstanceMods(File instanceDir) {
         File globalFile = new File(TMOD_GLOBAL_PATH);

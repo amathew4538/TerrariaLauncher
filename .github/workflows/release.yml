@@ -49,7 +49,10 @@ jobs:
             --input app_jar/ \
             --main-jar TerrariaLauncher.jar \
             --main-class TerrariaLauncher.TerrariaLauncher \
-            --icon package-resources/icon.icns
+            --icon package-resources/icon.icns \
+            --copyright "Copyright 2026 amathew4538" \
+            --license-file LICENSE \
+            --description "A tModLoader Instance Manager"
 
       - name: Bundle iTerm2
         run: |
@@ -122,7 +125,10 @@ jobs:
             --input app_jar/ `
             --main-jar TerrariaLauncher.jar `
             --main-class TerrariaLauncher.TerrariaLauncher `
-            --icon package-resources/icon.ico
+            --icon package-resources/icon.ico `
+            --copyright "Copyright 2026 amathew4538" `
+            --license-file LICENSE `
+            --description "A tModLoader Instance Manager"
 
       - name: Package Windows ZIP
         run: |

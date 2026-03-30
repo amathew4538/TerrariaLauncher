@@ -8,7 +8,7 @@ import java.io.File;
 import java.net.URL;
 
 public class TerrariaLauncher {
-    public static void main(String[] args) {
+    public TerrariaLauncher() {
         File runningLocation;
         try {
             String path = TerrariaLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
@@ -36,18 +36,18 @@ public class TerrariaLauncher {
 
         String[] messages = {"Now launching Terraria 3: Electric Boogalee", "dunno ran out of ideas", "Terraria? More like... uhh... Terraria! OOOOOHHHHHH!!!1!1!!1!"};
         JFrame mainFrame = new JFrame("Terraria Launcher: " + messages[(int)(Math.random() * messages.length)]);
-        
+
         BackgroundPanel bgPanel = new BackgroundPanel("/background.png");
         mainFrame.setContentPane(bgPanel);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         AnimatedLogo logo = new AnimatedLogo("/TerrariaLauncherLogo.png");
-        
+
         JPanel logoPanel = new JPanel(new BorderLayout());
         logoPanel.setOpaque(false);
         logoPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         logoPanel.add(logo, BorderLayout.CENTER);
-        
+
         bgPanel.add(logoPanel, BorderLayout.NORTH);
 
         JPanel headerWrapper = new JPanel();
@@ -119,7 +119,16 @@ public class TerrariaLauncher {
         if (!currentVersion.equals("Dev-Build")) {
             AutoUpdate.checkForUpdates(currentVersion);
         } else {
-            System.out.println("Running in Dev Mode: Skipping Auto-Update.");
+            DebugLogger.log("Running in Dev Mode: Skipping Auto-Update.");
         }
+    }
+    public static void main(String[] args) {
+        DebugLogger.initDebugWindow();
+
+        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            LauncherUtils.checkTerminalCompatibility();
+        }
+    
+        SwingUtilities.invokeLater(() -> new TerrariaLauncher());
     }
 }
