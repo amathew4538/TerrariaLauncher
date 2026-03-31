@@ -12,11 +12,11 @@ public class AutoUpdate {
     public static void checkForUpdates(String currentVersion) {
         // Don't run update check if we are in a development environment
         if ("Dev-Build".equals(currentVersion)) {
-            System.out.println("Development build detected. Skipping update check.");
+            DebugLogger.log("Development build detected. Skipping update check.");
             return;
         }
 
-        System.out.println("Checking for updates... Local version is: " + currentVersion);
+        DebugLogger.log("Checking for updates... Local version is: " + currentVersion);
         new Thread(() -> {
             try {
                 HttpURLConnection conn = (HttpURLConnection) new URL(REPO_URL).openConnection();
@@ -24,7 +24,7 @@ public class AutoUpdate {
                 conn.setRequestMethod("GET");
 
                 if (conn.getResponseCode() != 200) {
-                    System.out.println("GitHub API Error: " + conn.getResponseCode());
+                    DebugLogger.log("GitHub API Error: " + conn.getResponseCode());
                     return;
                 }
 
@@ -39,7 +39,7 @@ public class AutoUpdate {
                 // 1. Parse latest tag version
                 String latestTag = json.split("\"tag_name\":\"")[1].split("\"")[0];
                 String cleanLatest = latestTag.replace("v", "");
-                System.out.println("Latest on GitHub: " + cleanLatest);
+                DebugLogger.log("Latest on GitHub: " + cleanLatest);
 
                 if (!cleanLatest.equals(currentVersion)) {
                     // 2. Find the macOS Asset URL specifically
@@ -60,7 +60,7 @@ public class AutoUpdate {
                     }
 
                     if (downloadUrl.isEmpty()) {
-                        System.out.println("ERROR: Could not find TerrariaLauncher-macOS.zip in assets.");
+                        DebugLogger.log("ERROR: Could not find TerrariaLauncher-macOS.zip in assets.");
                         return;
                     }
 
@@ -77,7 +77,7 @@ public class AutoUpdate {
                         }
                     });
                 } else {
-                    System.out.println("App is up to date.");
+                    DebugLogger.log("App is up to date.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

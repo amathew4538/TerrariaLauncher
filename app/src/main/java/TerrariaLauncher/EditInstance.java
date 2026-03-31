@@ -1,17 +1,27 @@
 package TerrariaLauncher;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.Timer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -21,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 public class EditInstance {
 
@@ -172,7 +183,7 @@ public class EditInstance {
                     JOptionPane.showMessageDialog(null, "Mod settings updated successfully!",
                         "Done", JOptionPane.INFORMATION_MESSAGE);
                 });
-                
+
                 timer.setRepeats(false);
                 timer.start();
 
@@ -196,12 +207,138 @@ public class EditInstance {
                 }
                 writer.write("\n");
             }
-        
+
             writer.write("]");
             DebugLogger.log("ModEditor: Saved " + modList.size() + " mods to " + outputFile.getPath());
         } catch (IOException e) {
             DebugLogger.log("ModEditor Error: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public static void createInstance(String instanceName, File selectedIcon, File rootDir, JPanel container) {
+        JDialog progressDialog = new JDialog((java.awt.Frame)null, "Creating Instance: " + instanceName, true);
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        JLabel statusLabel = new JLabel("Fetching latest tModLoader...");
+
+        progressDialog.setLayout(new BorderLayout(10, 10));
+        progressDialog.add(statusLabel, BorderLayout.NORTH);
+        progressDialog.add(progressBar, BorderLayout.CENTER);
+        progressDialog.setSize(450, 140); // Slightly wider to fit long filenames
+        progressDialog.setLocationRelativeTo(null);
+        progressBar.setStringPainted(true);
+    
+        new Thread(() -> {
+            try {
+                // Get Download URL
+                String TMOD_API = "https://api.github.com/repos/tModLoader/tModLoader/releases/latest";
+                HttpURLConnection conn = (HttpURLConnection) new URL(TMOD_API).openConnection();
+                conn.setRequestProperty("User-Agent", "Terraria-Launcher");
+                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+                while ((line = rd.readLine()) != null) result.append(line);
+                rd.close();
+            
+                String downloadUrl = "";
+                String[] assets = result.toString().split("\"browser_download_url\":\"");
+                for (String asset : assets) {
+                    String urlCandidate = asset.split("\"")[0];
+                    if (urlCandidate.endsWith(".zip") && urlCandidate.contains("tModLoader") && !urlCandidate.contains("ExampleMod")) {
+                        downloadUrl = urlCandidate;
+                        break;
+                    }
+                }
+                if (downloadUrl.isEmpty()) throw new Exception("Could not find tModLoader.zip");
+            
+                // Download the ZIP
+                File tempZip = new File(System.getProperty("java.io.tmpdir"), "tModLoader.zip");
+                URL url = new URL(downloadUrl);
+                HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+                long fileSize = httpConn.getContentLengthLong();
+            
+                try (InputStream in = httpConn.getInputStream(); FileOutputStream out = new FileOutputStream(tempZip)) {
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    long totalBytesRead = 0;
+                    while ((bytesRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+                        int percent = (int) ((totalBytesRead * 100) / fileSize);
+                        SwingUtilities.invokeLater(() -> {
+                            statusLabel.setText("Downloading: " + percent + "%");
+                            progressBar.setValue(percent);
+                        });
+                    }
+                }
+            
+                // Extract Files with Progress Tracking
+                File newFolder = new File(rootDir, instanceName);
+                if (!newFolder.exists()) newFolder.mkdirs();
+            
+                // Count entries first to get an accurate progress bar
+                int totalEntries = 0;
+                try (ZipInputStream countStream = new ZipInputStream(new FileInputStream(tempZip))) {
+                    while (countStream.getNextEntry() != null) totalEntries++;
+                }
+            
+                try (ZipInputStream zis = new ZipInputStream(new FileInputStream(tempZip))) {
+                    ZipEntry entry;
+                    int processedEntries = 0;
+                    byte[] buffer = new byte[8192];
+                
+                    while ((entry = zis.getNextEntry()) != null) {
+                        File newFile = new File(newFolder, entry.getName());
+                        processedEntries++;
+                    
+                        // Update UI with filename
+                        final String fileName = entry.getName();
+                        final int progress = (int) (((double) processedEntries / totalEntries) * 100);
+                        SwingUtilities.invokeLater(() -> {
+                            statusLabel.setText("Extracting: " + fileName);
+                            progressBar.setValue(progress);
+                        });
+                    
+                        if (entry.isDirectory()) {
+                            newFile.mkdirs();
+                        } else {
+                            newFile.getParentFile().mkdirs();
+                            try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                                int len;
+                                while ((len = zis.read(buffer)) > 0) {
+                                    fos.write(buffer, 0, len);
+                                }
+                            }
+                        }
+                        zis.closeEntry();
+                    }
+                }
+            
+                // Post-Extraction
+                File scriptFile = new File(newFolder, "start-tmodloader.sh");
+                if (scriptFile.exists()) scriptFile.setExecutable(true);
+            
+                if (selectedIcon != null && selectedIcon.exists()) {
+                    File destIcon = new File(newFolder, "icon.png");
+                    Files.copy(selectedIcon.toPath(), destIcon.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            
+                tempZip.delete();
+                SwingUtilities.invokeLater(() -> {
+                    progressDialog.dispose();
+                    LauncherUtils.scanAndPopulate(container, rootDir);
+                    JOptionPane.showMessageDialog(null, "Instance created successfully!");
+                });
+            
+            } catch (Exception e) {
+                e.printStackTrace();
+                SwingUtilities.invokeLater(() -> {
+                    progressDialog.dispose();
+                    JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+                });
+            }
+        }).start();
+    
+        progressDialog.setVisible(true);
     }
 }

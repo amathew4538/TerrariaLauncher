@@ -26,9 +26,9 @@ public class ModCache {
                 
                 // Overwrite the global enabled.json with the instance's specific one
                 Files.copy(instanceCache.toPath(), globalFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("ModCache: Loaded enabled.json for " + instanceDir.getName());
+                DebugLogger.log("ModCache: Loaded enabled.json for " + instanceDir.getName());
             } else {
-                System.out.println("ModCache: No enabled.json found in instance. Using global default.");
+                DebugLogger.log("ModCache: No enabled.json found in instance. Using global default.");
             }
         } catch (IOException e) {
             System.err.println("ModCache Error (Load): " + e.getMessage());
@@ -46,7 +46,7 @@ public class ModCache {
         try {
             if (globalFile.exists()) {
                 Files.copy(globalFile.toPath(), instanceCache.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("ModCache: Saved enabled.json for " + instanceDir.getName());
+                DebugLogger.log("ModCache: Saved enabled.json for " + instanceDir.getName());
             }
         } catch (IOException e) {
             System.err.println("ModCache Error (Save): " + e.getMessage());

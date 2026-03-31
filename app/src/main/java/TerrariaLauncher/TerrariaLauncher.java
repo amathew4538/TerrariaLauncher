@@ -3,6 +3,8 @@ package TerrariaLauncher;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.ui.FlatLineBorder;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.io.File;
 import java.net.URL;
@@ -90,27 +92,51 @@ public class TerrariaLauncher {
         middleWrapper.add(scrollPane, BorderLayout.CENTER);
         bgPanel.add(middleWrapper, BorderLayout.CENTER);
 
+        JButton createBtn = new JButton("Create Instance");
+        createBtn.setPreferredSize(new Dimension(200, 50));
+        createBtn.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog(mainFrame, "Enter Instance Name:");
+            if (name != null && !name.trim().isEmpty()) {
+                JFileChooser iconChooser = new JFileChooser();
+
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Images (*.png)", "png");
+
+                iconChooser.addChoosableFileFilter(filter);
+                iconChooser.setFileFilter(filter);
+
+                File icon = null;
+
+                int result = iconChooser.showOpenDialog(mainFrame);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    icon = iconChooser.getSelectedFile();
+                }
+
+                EditInstance.createInstance(name, icon, finalLocation, instancePanel);
+            }
+        });
+
         JButton quitBtn = new JButton("Quit");
         quitBtn.setPreferredSize(new Dimension(200, 50));
         quitBtn.addActionListener(e -> System.exit(0));
 
         String currentVersion = DebugLogger.getAppVersion();
-
         JLabel versionLabel = new JLabel("v" + currentVersion + " ");
         versionLabel.setForeground(new Color(255, 255, 255, 255));
         versionLabel.setFont(versionLabel.getFont().deriveFont(24f));
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setOpaque(false);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 110, 10, 10));
 
         JPanel btnWrapper = new JPanel();
         btnWrapper.setOpaque(false);
+        btnWrapper.add(createBtn);
+        btnWrapper.add(Box.createHorizontalStrut(20));
         btnWrapper.add(quitBtn);
 
         bottomPanel.add(btnWrapper, BorderLayout.CENTER);
         bottomPanel.add(versionLabel, BorderLayout.EAST);
-
+        
         bgPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
