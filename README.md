@@ -68,6 +68,10 @@
     C:/Users/{YOUR USERNAME}/Documents/
     └── Terraria/
         ├── TerrariaLauncher.exe
+        ├── runtime/
+        │    └── ...
+        ├── app/
+        │    └── ...
         ├── Terraria.exe
         ├── calamityMod/
         │   ├── start-tmodloader.bat
