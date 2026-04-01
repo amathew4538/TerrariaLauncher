@@ -1,4 +1,4 @@
-# Teraria Launcher v1.3.1: A tModLoader Instance Manager
+# Teraria Launcher v1.3.2: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -168,3 +168,7 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 ## Footnotes
 
 <sup>1</sup> Testers and coders needed.
+
+***
+
+<div style="text-align: center">Copyright © 2026 amathew4538. Licensed under AGPLv3. Not liable for any damages caused through use.</div>
