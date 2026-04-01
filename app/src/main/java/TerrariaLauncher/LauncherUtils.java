@@ -33,11 +33,31 @@ public class LauncherUtils {
         try {
             if (os.contains("win")) {
                 File target = path.toFile();
+
                 File workingDir = target.isDirectory() ? target : target.getParentFile();
+                DebugLogger.log("Starting launch in: " + workingDir.getAbsolutePath());
+
+                ModCache.loadInstanceMods(workingDir);
+
                 pb.directory(workingDir);
-                DebugLogger.log("Platform: Windows detected.");
-                String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
-                pb.command("cmd", "/c", "start", "", cmd);
+
+                DebugLogger.log("Platform: Windows detected");
+
+                String binary = target.getName().toLowerCase().contains("terraria.exe") ? "Terraria.exe" : "start-tmodloader.bat";
+
+                // This command opens a NEW cmd window, runs the game, waits for logs, then exits.
+                // Use ^ to escape characters inside the nested CMD string.
+                String winShellCmd = String.format(
+                    "title Terraria Launcher Console && " +
+                    "echo Launcher: Starting %s... && " +
+                    "start /b %s && " +
+                    "echo Launcher: Waiting for game window... && " +
+                    "timeout /t 5 >nul && " +
+                    "echo Launcher: Game initialized. This window will close automatically. && " +
+                    "timeout /t 5 >nul && exit",
+                    binary, binary);
+                
+                pb.command("cmd", "/c", "start", "cmd", "/c", winShellCmd);
                 pb.start();
             } else if (os.contains("mac")) {
                 DebugLogger.log("Platform: macOS detected.");

@@ -24,7 +24,7 @@ jobs:
 
       - name: Update README and Push
         run: |
-          sed -i "s/{VERSION}/${{ steps.get_tag.outputs.TAG }}/g" README.md
+          sed -i "s/Launcher v[0-9.]*/Launcher ${{ steps.get_tag.outputs.TAG }}/g" README.md
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
