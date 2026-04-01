@@ -2,8 +2,7 @@ name: Deploy Website
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: ["main"]
 permissions:
   contents: read
   pages: write
