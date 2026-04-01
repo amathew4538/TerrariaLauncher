@@ -1,166 +1,56 @@
 package TerrariaLauncher;
 
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
-import com.formdev.flatlaf.ui.FlatLineBorder;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.io.File;
-import java.net.URL;
 
 public class TerrariaLauncher {
     /**
      * Initialize the main app
      */
     public TerrariaLauncher() {
-        File runningLocation;
-        try {
-            String path = TerrariaLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            File jarFile = new File(path);
-            if (path.contains(".app")) {
-                runningLocation = jarFile.getParentFile().getParentFile().getParentFile().getParentFile();
-            } else {
-                runningLocation = new File(".");
-            }
-        } catch (Exception e) {
-            runningLocation = new File(".");
-        }
+        File finalLocation = LauncherUI.determineRunningLocation();
+        DebugLogger.log("Root folder found at " + finalLocation);
 
-        final File finalLocation = runningLocation;
+        ThemeManager.applyTheme();
+        DebugLogger.log("Theme Applied");
 
-        try {
-            UIManager.setLookAndFeel(new FlatMacDarkLaf());
-            URL fontUrl = TerrariaLauncher.class.getResource("/Andy-Bold.ttf");
-            if (fontUrl != null) {
-                Font andyFont = Font.createFont(Font.TRUETYPE_FONT, fontUrl.openStream());
-                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(andyFont);
-                LauncherUtils.setUIFont(andyFont.deriveFont(18f));
-            }
-        } catch (Exception ex) { ex.printStackTrace(); }
-
-        String[] messages = {"Now launching Terraria 3: Electric Boogalee",
-            "dunno ran out of ideas",
-            "Terraria? More like... uhh... Terraria! OOOOOHHHHHH!!!1!1!!1!",
-            "Into the Sky!",
-            "Huston, the lanterns are coming!",
-            "*insert launcher message here*",
-            "An epic dev wrote this.",
-            "April Fools!",
-            "Also check out Prism Launcher!",
-            "Woopdedoo!",
-            "Hey Michael, Vsauce here. What if Terraria was easy?",
-            "Terraria exists... or does it?"};
-        JFrame mainFrame = new JFrame("Terraria Launcher: " + messages[(int)(Math.random() * messages.length)]);
+        JFrame mainFrame = LauncherUI.createMainFrame();
+        DebugLogger.log("Main Frame Created");
 
         BackgroundPanel bgPanel = new BackgroundPanel("/background.png");
+        bgPanel.setLayout(new BorderLayout());
         mainFrame.setContentPane(bgPanel);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        DebugLogger.log("Background panel created");
 
-        AnimatedLogo logo = new AnimatedLogo("/TerrariaLauncherLogo.png");
-
-        JPanel logoPanel = new JPanel(new BorderLayout());
-        logoPanel.setOpaque(false);
-        logoPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
-        logoPanel.add(logo, BorderLayout.CENTER);
-
+        JPanel logoPanel = LauncherUI.createLogo();
         bgPanel.add(logoPanel, BorderLayout.NORTH);
+        DebugLogger.log("Logo Created");
 
-        JPanel headerWrapper = new JPanel();
-        headerWrapper.setOpaque(false);
-        JPanel headerPanel = new JPanel(new BorderLayout(20, 0));
-        headerPanel.setPreferredSize(new Dimension(400, 60));
-        headerPanel.setOpaque(false);
-        headerPanel.putClientProperty("FlatLaf.style", "arc: 20; background: rgba(30, 35, 60, 200)");
-        headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            new FlatLineBorder(new Insets(0,0,0,0), new Color(60, 70, 110), 2, 20),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
+        JPanel headerPanel = LauncherUI.createHeaderPanel();
 
-        JLabel selectLabel = new JLabel("Select Instance:", JLabel.CENTER);
-        selectLabel.setForeground(Color.WHITE);
-        selectLabel.setFont(selectLabel.getFont().deriveFont(Font.BOLD, 26f));
-        headerPanel.add(selectLabel, BorderLayout.CENTER);
+        JPanel headerWrapper = LauncherUI.createHeaderWrapper(finalLocation);
+        DebugLogger.log("Instance Panel Created");
 
-        JPanel instancePanel = new JPanel();
-        instancePanel.setLayout(new BoxLayout(instancePanel, BoxLayout.Y_AXIS));
-        instancePanel.setOpaque(false);
-        instancePanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 50, 50));
-
-        RefreshButton refreshBtn = new RefreshButton(instancePanel, finalLocation);
-        headerPanel.add(refreshBtn, BorderLayout.EAST);
-
-        headerPanel.add(Box.createHorizontalStrut(40), BorderLayout.WEST);
-        headerWrapper.add(headerPanel);
+        JPanel instancePanel = LauncherUI.createInstancePanel(headerWrapper, headerPanel, finalLocation);
+        DebugLogger.log("Instance Panel Created");
 
         LauncherUtils.scanAndPopulate(instancePanel, finalLocation);
+        DebugLogger.log("Instances added");
 
-        JScrollPane scrollPane = new JScrollPane(instancePanel);
-        scrollPane.setBorder(null);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-
-        JPanel middleWrapper = new JPanel(new BorderLayout());
-        middleWrapper.setOpaque(false);
-        middleWrapper.add(headerWrapper, BorderLayout.NORTH);
-        middleWrapper.add(scrollPane, BorderLayout.CENTER);
+        JPanel middleWrapper = LauncherUI.createMiddleWrapper(instancePanel, headerWrapper);
         bgPanel.add(middleWrapper, BorderLayout.CENTER);
+        DebugLogger.log("Middle Wrapper Created");
 
-        JButton createBtn = new JButton("Create Instance");
-        createBtn.setPreferredSize(new Dimension(200, 50));
-        createBtn.addActionListener(e -> {
-            String name = JOptionPane.showInputDialog(mainFrame, "Enter Instance Name:");
-            if (name != null && !name.trim().isEmpty()) {
-                JFileChooser iconChooser = new JFileChooser();
-
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Images (*.png)", "png");
-
-                iconChooser.addChoosableFileFilter(filter);
-                iconChooser.setFileFilter(filter);
-
-                File icon = null;
-
-                int result = iconChooser.showOpenDialog(mainFrame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    icon = iconChooser.getSelectedFile();
-                }
-
-                EditInstance.createInstance(name, icon, finalLocation, instancePanel);
-            }
-        });
-
-        JButton quitBtn = new JButton("Quit");
-        quitBtn.setPreferredSize(new Dimension(200, 50));
-        quitBtn.addActionListener(e -> System.exit(0));
-
-        String currentVersion = DebugLogger.getAppVersion();
-        JLabel versionLabel = new JLabel("v" + currentVersion + " ");
-        versionLabel.setForeground(new Color(255, 255, 255, 255));
-        versionLabel.setFont(versionLabel.getFont().deriveFont(24f));
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setOpaque(false);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 110, 10, 10));
-
-        JPanel btnWrapper = new JPanel();
-        btnWrapper.setOpaque(false);
-        btnWrapper.add(createBtn);
-        btnWrapper.add(Box.createHorizontalStrut(20));
-        btnWrapper.add(quitBtn);
-
-        bottomPanel.add(btnWrapper, BorderLayout.CENTER);
-        bottomPanel.add(versionLabel, BorderLayout.EAST);
-        
+        JPanel bottomPanel = LauncherUI.createBottomPanel(middleWrapper, finalLocation, instancePanel);
         bgPanel.add(bottomPanel, BorderLayout.SOUTH);
+        DebugLogger.log("Bottom Panel Created");
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
 
-        if (!currentVersion.equals("Dev-Build")) {
-            AutoUpdate.checkForUpdates(currentVersion);
-        } else {
-            DebugLogger.log("Running in Dev Mode: Skipping Auto-Update.");
-        }
+        AutoUpdate.handleUpdates(DebugLogger.getAppVersion());
     }
     public static void main(String[] args) {
         DebugLogger.initDebugWindow();

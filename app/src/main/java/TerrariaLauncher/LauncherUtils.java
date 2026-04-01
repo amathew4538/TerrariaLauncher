@@ -1,13 +1,10 @@
 package TerrariaLauncher;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import java.awt.*;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Enumeration;
 
 public class LauncherUtils {
     /**
@@ -216,19 +213,5 @@ public class LauncherUtils {
         if (name == null || name.isEmpty()) return name;
         String result = name.replaceAll("([a-z])([A-Z])", "$1 $2");
         return result.substring(0, 1).toUpperCase() + result.substring(1);
-    }
-
-    /**
-     * Sets the font of the app
-     * @param font a font file
-     */
-    public static void setUIFont(Font font) {
-        Enumeration<Object> keys = UIManager.getDefaults().keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            if (UIManager.get(key) instanceof FontUIResource) {
-                UIManager.put(key, font);
-            }
-        }
     }
 }

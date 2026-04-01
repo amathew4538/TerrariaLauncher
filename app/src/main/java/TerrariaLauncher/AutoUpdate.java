@@ -179,4 +179,17 @@ public class AutoUpdate {
             System.exit(0);
         }
     }
+
+
+    /**
+     * Handle auto-updating based on version
+     * @param version the version string
+     */
+    public static void handleUpdates(String version) {
+        if (!version.equals("Dev-Build")) {
+            AutoUpdate.checkForUpdates(version);
+        } else {
+            DebugLogger.log("Running in Dev Mode: Skipping Auto-Update.");
+        }
+    }
 }
