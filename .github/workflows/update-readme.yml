@@ -15,6 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Get the latest tag
@@ -23,7 +24,6 @@ jobs:
 
       - name: Update README.md
         run: |
-          # Use sed to find {VERSION} and replace it with the actual tag
           sed -i "s/{VERSION}/${{ steps.get_tag.outputs.TAG }}/g" README.md
 
       - name: Commit and push changes
