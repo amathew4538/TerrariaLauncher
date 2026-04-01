@@ -21,7 +21,7 @@ public class LauncherUtils {
 
         if (folder.getName().equalsIgnoreCase("TerrariaLauncher.app") ||
             folder.getName().equalsIgnoreCase("iTerm.app") ||
-            folder.getName().equalsIgnoreCase("Contents") ||
+            folder.getName().equalsIgnoreCase("Content") ||
             folder.getName().equalsIgnoreCase("runtime")) {
                 DebugLogger.log("Error: Targeting launcher or iTerm. Aborting.");
                 return;
@@ -32,9 +32,12 @@ public class LauncherUtils {
 
         try {
             if (os.contains("win")) {
+                File target = path.toFile();
+                File workingDir = target.isDirectory() ? target : target.getParentFile();
+                pb.directory(workingDir);
                 DebugLogger.log("Platform: Windows detected.");
                 String cmd = folder.getName().toLowerCase().contains("base") ? "Terraria.exe" : "start-tmodloader.bat";
-                pb.command("cmd", "/c", "start", cmd);
+                pb.command("cmd", "/c", "start", "", cmd);
                 pb.start();
             } else if (os.contains("mac")) {
                 DebugLogger.log("Platform: macOS detected.");
@@ -193,7 +196,7 @@ public class LauncherUtils {
                 if (!file.isDirectory()) continue;
                 String name = file.getName();
                 if (name.startsWith(".") || name.equals("app") || name.equals("dist") || name.equals(baseName) 
-                    || name.contains("TerrariaLauncher") || name.contains("iTerm") || name.equalsIgnoreCase("Contents")
+                    || name.contains("TerrariaLauncher") || name.contains("iTerm") || name.equalsIgnoreCase("Content")
                     || name.equalsIgnoreCase("runtime")) continue;
 
                 container.add(new InstanceRow(name, file.toPath(), false, container, rootDir));
