@@ -10,7 +10,7 @@ public class AutoUpdate {
     private static final String REPO_URL = "https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/latest";
 
     public static void checkForUpdates(String currentVersion) {
-        // Don't run update check if we are in a development environment
+        // Don't run update check if it's a vDev-Build
         if ("Dev-Build".equals(currentVersion)) {
             DebugLogger.log("Development build detected. Skipping update check.");
             return;
@@ -36,13 +36,13 @@ public class AutoUpdate {
 
                 String json = result.toString();
 
-                // 1. Parse latest tag version
+                // Parse latest tag version
                 String latestTag = json.split("\"tag_name\":\"")[1].split("\"")[0];
                 String cleanLatest = latestTag.replace("v", "");
                 DebugLogger.log("Latest on GitHub: " + cleanLatest);
 
                 if (!cleanLatest.equals(currentVersion)) {
-                    // 2. Find the macOS Asset URL specifically
+                    // Find the macOS Asset URL specifically
                     String downloadUrl = "";
                     String[] assetBlocks = json.split("\\{\"url\":\"https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/assets/");
 
@@ -65,7 +65,7 @@ public class AutoUpdate {
                     }
 
                     final String finalUrl = downloadUrl;
-                    
+
                     // Show confirmation popup on the UI thread
                     SwingUtilities.invokeLater(() -> {
                         int choice = JOptionPane.showConfirmDialog(null,
@@ -145,11 +145,10 @@ public class AutoUpdate {
         if (os.contains("mac")) {
             String stageDir = installDir + "update_stage/";
 
-            // Final robust macOS script:
-            // 1. Cleans old app/iTerm
-            // 2. Unzips to a stage folder
-            // 3. Finds the .apps inside that stage folder (handling the 'TerrariaUpdate' wrapper) and moves them up
-            // 4. Fixes permissions and quarantine, then launches
+            // Deletes iTerm
+            // Unzips to a temp directory
+            // Finds the .apps inside that folder and moves them up
+            // Fixes permissions and quarantine, then launches
             String script = String.format(
                 "mkdir -p '%1$s' '%2$s' && sleep 2 && " +
                 "rm -rf '%1$sTerrariaLauncher.app' '%1$siTerm.app' && " +

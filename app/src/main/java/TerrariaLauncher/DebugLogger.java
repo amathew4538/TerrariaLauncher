@@ -11,6 +11,10 @@ public class DebugLogger {
     private static JTextArea debugTextArea;
     private static final boolean IS_DEBUG = checkDebugStatus();
 
+    /**
+     * Check if the app is in Debug Mode
+     * @return false if release, else true
+     */
     public static boolean checkDebugStatus() {
         try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
             java.util.Properties prop = new java.util.Properties();
@@ -20,13 +24,18 @@ public class DebugLogger {
             String buildType = prop.getProperty("build.type");
 
             // If the variable hasn't been replaced, it will still look like "${build.type}"
-            // We only return false if it is explicitly set to "release"
+            // only return false if it is explicitly set to "release"
             return !"release".equalsIgnoreCase(buildType);
         } catch (Exception ex) {
             return true;
         }
     }
 
+    /**
+     * Print string to log window
+     * @param message string to print in log
+     * @see {@link DebugLogger#initDebugWindow()}
+     */
     public static void log(String message) {
         if (!IS_DEBUG) return;
 
@@ -39,6 +48,9 @@ public class DebugLogger {
         }
     }
 
+    /**
+     * Create a log window
+     */
     public static void initDebugWindow() {
         if (!IS_DEBUG) return;
 
@@ -54,6 +66,9 @@ public class DebugLogger {
         log("--- Debug Window Initialized ---");
     }
 
+    /**
+     * Get the app version from config.properties
+     */
     public static String getAppVersion() {
         try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
             java.util.Properties prop = new java.util.Properties();

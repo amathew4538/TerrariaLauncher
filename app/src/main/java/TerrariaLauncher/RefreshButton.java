@@ -6,7 +6,11 @@ import java.io.File;
 import java.net.URL;
 
 public class RefreshButton extends JButton {
-    
+    /**
+     * Refreshes the instance list
+     * @param panelToRefresh the JPanel to refresh
+     * @param rootPath the root path that the instances are in
+     */
     public RefreshButton(JPanel panelToRefresh, File rootPath) {
         URL refreshUrl = getClass().getResource("/refresh.png");
         if (refreshUrl != null) {

@@ -25,7 +25,7 @@ class BackgroundPanel extends JPanel {
             yOffset -= scrollSpeed;
 
             if (backgroundImage != null) {
-                // Important: Calculate reset based on the SCALED size
+                // Calculate reset based on the SCALED size, not normal size
                 int scaledW = (int) (backgroundImage.getWidth(null) * scale);
                 int scaledH = (int) (backgroundImage.getHeight(null) * scale);
 

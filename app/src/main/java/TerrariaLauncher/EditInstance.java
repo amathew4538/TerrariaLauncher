@@ -58,9 +58,7 @@ public class EditInstance {
         new Thread(() -> {
             try {
                 // Count total files first for the progress bar
-                List<Path> allFiles = Files.walk(path)
-                                        .sorted(Comparator.reverseOrder())
-                                        .toList();
+                List<Path> allFiles = Files.walk(path).sorted(Comparator.reverseOrder()).toList();
                 int total = allFiles.size();
 
                 for (int i = 0; i < total; i++) {
@@ -80,7 +78,7 @@ public class EditInstance {
                     file.delete();
                 }
 
-                // 4. Finalize
+                // Wait until finished then confirm deletion
                 SwingUtilities.invokeLater(() -> {
                     dialog.dispose();
                     DebugLogger.log("EditInstance: Successfully deleted " + folderName);
@@ -133,9 +131,9 @@ public class EditInstance {
             List<JCheckBox> checkBoxes = new ArrayList<>();
 
             for (File file : modFiles) {
-                // Internal name (e.g., "CalamityMod")
+                // Raw Folder name e.g. "calamityMod"
                 String rawName = file.getName().substring(0, file.getName().length() - 5);
-                // Display name (e.g., "Calamity Mod")
+                // Display name e.g. "Calamity Mod"
                 String displayName = LauncherUtils.formatFolderName(rawName);
 
                 JCheckBox checkBox = new JCheckBox(displayName);

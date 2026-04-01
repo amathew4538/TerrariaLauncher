@@ -10,6 +10,10 @@ public class AnimatedLogo extends JComponent {
     private double scale = 1.0;
     private double time = 0;
 
+    /**
+     * Initialize the logo and animate it
+     * @param resourcePath path to image
+     */
     public AnimatedLogo(String resourcePath) {
         java.net.URL imgUrl = getClass().getResource(resourcePath);
         if (imgUrl != null) {

@@ -12,6 +12,15 @@ public class InstanceRow extends JPanel {
     private JPanel parentContainer;
     private java.io.File rootDir;
 
+    /**
+     * Adds an instance to the row of instances
+     * @param folderName name of the instance folder
+     * @param folderPath path to the instance folder
+     * @param isBase whether it is base Terraria or not
+     * @param container the JPanel to add the instance to0
+     * @param root the root directory (folder the app is in)
+     * @apiNote This gets called in {@link LauncherUtils#scanAndPopulate(JPanel, java.io.File) LauncherUtils.scanAndPopulate()}
+     */
     public InstanceRow(String folderName, Path folderPath, boolean isBase, JPanel container, java.io.File root) {
         this.parentContainer = container;
         this.rootDir = root;
@@ -47,13 +56,12 @@ public class InstanceRow extends JPanel {
             add(new JLabel(new ImageIcon(img)), BorderLayout.WEST);
         }
 
-        // Text - Title remains in CENTER
+        // Text (title remains in the center)
         JLabel titleLabel = new JLabel(isBase ? "Base Terraria" : LauncherUtils.formatFolderName(folderName));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(titleLabel.getFont().deriveFont(24f));
         add(titleLabel, BorderLayout.CENTER);
 
-        // Action Panel (Launch + Menu)
         // FlowLayout.CENTER ensures the button and dots stay vertically aligned
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         actionPanel.setOpaque(false);
@@ -74,7 +82,7 @@ public class InstanceRow extends JPanel {
         menuBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         if (isBase) {
-            // Invisible but occupies space to keep "Launch" position consistent
+            // Invisible but occupies space to keep Launch position consistent
             menuBtn.setVisible(false);
         }
 

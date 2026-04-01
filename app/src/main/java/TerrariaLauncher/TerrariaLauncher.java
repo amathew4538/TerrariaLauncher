@@ -10,6 +10,9 @@ import java.io.File;
 import java.net.URL;
 
 public class TerrariaLauncher {
+    /**
+     * Initialize the main app
+     */
     public TerrariaLauncher() {
         File runningLocation;
         try {
@@ -152,7 +155,7 @@ public class TerrariaLauncher {
         DebugLogger.initDebugWindow();
 
         if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-            LauncherUtils.checkTerminalCompatibility();
+            TerminalChecker.checkTerminalCompatibility();
         }
     
         SwingUtilities.invokeLater(() -> new TerrariaLauncher());

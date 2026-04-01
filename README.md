@@ -1,4 +1,4 @@
-# Teraria Launcher v1.2.3: A tModLoader Instance Manager
+# Teraria Launcher v1.3.0: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
@@ -20,7 +20,8 @@
 - It automatically determines the tmodloader instance through folder name
 - It can launch both Base Terraria and any tmodloader instances
 - It caches loaded mods in each instance
-- It currently supports Windows<sup>1</sup> and MacOS
+- It currently supports MacOS
+- Windows isn't supported (yet)<sup>1</sup>
 - It can change active mods in an instance
 - It can delete instances
 
@@ -92,13 +93,14 @@
     ```
 
 4. Add an `icon.png` to every folder (base Terraria already has one)
-5. Add ***ALL*** of your mods to the local folder
+5. Delete steam_api.dll on Windows
+6. Add ***ALL*** of your mods to the local folder
     1. MacOS
     ```~/Library/Application Support/Terraria/tModLoader-preview/Mods```
     2. Windows
     ```C:\Users\{YOUR USERNAME}\Documents\My Games\Terraria\tModLoader\Mods```
-6. In each instance, enable the mods you want. (Enabled mods will be managed by the app)
-7. Run the app and click launch on the instance!
+7. In each instance, enable the mods you want. (Enabled mods will be managed by the app)
+8. Run the app and click launch on the instance!
 
 ***
 
@@ -165,4 +167,4 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 
 ## Footnotes
 
-<sup>1</sup> Testers and coders needed. Not confirmed.
+<sup>1</sup> Testers and coders needed.

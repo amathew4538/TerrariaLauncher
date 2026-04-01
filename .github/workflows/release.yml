@@ -42,7 +42,6 @@ jobs:
 
       - name: Create App Image
         run: |
-          # We remove --license-file here to avoid the app-image error
           jpackage --type app-image \
             --dest app_build \
             --name "TerrariaLauncher" \
