@@ -39,7 +39,18 @@ public class TerrariaLauncher {
             }
         } catch (Exception ex) { ex.printStackTrace(); }
 
-        String[] messages = {"Now launching Terraria 3: Electric Boogalee", "dunno ran out of ideas", "Terraria? More like... uhh... Terraria! OOOOOHHHHHH!!!1!1!!1!"};
+        String[] messages = {"Now launching Terraria 3: Electric Boogalee",
+            "dunno ran out of ideas",
+            "Terraria? More like... uhh... Terraria! OOOOOHHHHHH!!!1!1!!1!",
+            "Into the Sky!",
+            "Huston, the lanterns are coming!",
+            "*insert launcher message here*",
+            "An epic dev wrote this.",
+            "April Fools!",
+            "Also check out Prism Launcher!",
+            "Woopdedoo!",
+            "Hey Michael, Vsauce here. What if Terraria was easy?",
+            "Terraria exists... or does it?"};
         JFrame mainFrame = new JFrame("Terraria Launcher: " + messages[(int)(Math.random() * messages.length)]);
 
         BackgroundPanel bgPanel = new BackgroundPanel("/background.png");
