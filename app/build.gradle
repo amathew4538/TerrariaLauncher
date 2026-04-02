@@ -26,6 +26,10 @@ dependencies {
     implementation libs.guava
 
     implementation 'com.formdev:flatlaf:3.7.1'
+
+    implementation('org.codehaus.plexus:plexus-utils:4.0.3') {
+        because 'Fixes CVE-2025-67030 directory traversal vulnerability'
+    }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

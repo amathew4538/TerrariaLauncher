@@ -284,32 +284,41 @@ public class EditInstance {
                     ZipEntry entry;
                     int processedEntries = 0;
                     byte[] buffer = new byte[8192];
-                
+
+                    // Zip Slip Error Fixed, prevent this next time.
                     while ((entry = zis.getNextEntry()) != null) {
-                        File newFile = new File(newFolder, entry.getName());
-                        processedEntries++;
-                    
-                        // Update UI with filename
-                        final String fileName = entry.getName();
-                        final int progress = (int) (((double) processedEntries / totalEntries) * 100);
-                        SwingUtilities.invokeLater(() -> {
-                            statusLabel.setText("Extracting: " + fileName);
-                            progressBar.setValue(progress);
-                        });
-                    
-                        if (entry.isDirectory()) {
-                            newFile.mkdirs();
-                        } else {
-                            newFile.getParentFile().mkdirs();
-                            try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                                int len;
-                                while ((len = zis.read(buffer)) > 0) {
-                                    fos.write(buffer, 0, len);
-                                }
+                    File newFile = new File(newFolder, entry.getName());
+
+                    String canonicalDestinationPath = newFile.getCanonicalPath();
+                    String canonicalIDirectoryPath = newFolder.getCanonicalPath();
+                                    
+                    if (!canonicalDestinationPath.startsWith(canonicalIDirectoryPath + File.separator)) {
+                        throw new IOException("Entry is outside of the target dir: " + entry.getName());
+                    }
+                
+                    processedEntries++;
+                
+                    // Update UI with filename
+                    final String fileName = entry.getName();
+                    final int progress = (int) (((double) processedEntries / totalEntries) * 100);
+                    SwingUtilities.invokeLater(() -> {
+                        statusLabel.setText("Extracting: " + fileName);
+                        progressBar.setValue(progress);
+                    });
+                
+                    if (entry.isDirectory()) {
+                        newFile.mkdirs();
+                    } else {
+                        newFile.getParentFile().mkdirs();
+                        try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                            int len;
+                            while ((len = zis.read(buffer)) > 0) {
+                                fos.write(buffer, 0, len);
                             }
                         }
-                        zis.closeEntry();
                     }
+                    zis.closeEntry();
+                }
                 }
             
                 // Post-Extraction
