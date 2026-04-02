@@ -57,10 +57,14 @@ jobs:
       - name: Get iTerm2 Metadata
         id: iterm_meta
         run: |
-          RAW_LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" || echo "default")
-          # Create a hash of the header string
+          # Fetch headers from the primary stable link
+          # Use -L to follow redirects and || echo to prevent script failure
+          RAW_LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" || echo "iterm2-default")
+          
+          # Convert the date string into a clean MD5 hash (removes commas/spaces automatically)
           HASH_LM=$(echo "$RAW_LM" | md5sum | cut -d' ' -f1)
-          echo "LAST_MODIFIED=$HASH_LM" >> $GITHUB_OUTPUT
+          
+          echo "IT_HASH=$HASH_LM" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Cache iTerm2
@@ -68,19 +72,21 @@ jobs:
         uses: actions/cache@v4
         with:
           path: iterm.zip
-          key: iterm2-stable-${{ steps.iterm_meta.outputs.LAST_MODIFIED }}
+          key: iterm2-v1-${{ steps.iterm_meta.outputs.IT_HASH }}
 
       - name: Bundle iTerm2 and License
         run: |
-          # Only download if the cache missed
           if [ ! -f iterm.zip ]; then
-            echo "Cache miss! Downloading latest iTerm2..."
-            curl -L -f "https://iterm2.getiterm2.com/downloads/stable/latest" -o iterm.zip
+            echo "Cache miss! Downloading from primary iTerm2 server..."
+            # Using the primary iterm2.com link which is more reliable
+            curl -L -f "https://iterm2.com/downloads/stable/latest" -o iterm.zip
           else
-            echo "Cache hit! Using cached iTerm2."
+            echo "Cache hit! Using cached iterm.zip"
           fi
+          
           unzip -q iterm.zip -d app_build/
           cp LICENSE app_build/LICENSE.txt
+        shell: bash
 
       - name: Create FixPermissions
         run: |
