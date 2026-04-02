@@ -57,8 +57,12 @@ jobs:
       - name: Get iTerm2 Metadata
         id: iterm_meta
         run: |
-          # Get the 'Last-Modified' date from the server headers
-          LM=$(curl -sI "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" | tr -d '\r')
+          LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" | tr -d '\r' || true)
+
+          if [ -z "$LM" ]; then
+            LM="default-cache-v1"
+          fi
+          
           echo "LAST_MODIFIED=$LM" >> $GITHUB_OUTPUT
         shell: bash
 
