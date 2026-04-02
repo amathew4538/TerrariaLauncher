@@ -11,7 +11,7 @@ public class ModCache {
     private static final String macGlobalPath = System.getProperty("user.home")
         + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
     private static final String windowsGlobalPath = System.getProperty("user.home")
-        + "\\Documents\\My Games\\Terraria\\tModLoader\\Mods";
+        + "\\Documents\\My Games\\Terraria\\tModLoader\\Mods\\enabled.json";
 
     /**
      * Swaps the enabled.json from the Instance into the Global folder.
