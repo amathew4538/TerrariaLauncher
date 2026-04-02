@@ -1,6 +1,6 @@
 ---
 name: Documentation changes
-about: Describe this issue template's purpose here.
+about: Create a documentation change report
 title: "[DOCS] Issue Name Here"
 labels: documentation
 assignees: ''
