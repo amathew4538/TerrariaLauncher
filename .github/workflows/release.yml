@@ -57,13 +57,10 @@ jobs:
       - name: Get iTerm2 Metadata
         id: iterm_meta
         run: |
-          LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" | tr -d '\r' || true)
-
-          if [ -z "$LM" ]; then
-            LM="default-cache-v1"
-          fi
-          
-          echo "LAST_MODIFIED=$LM" >> $GITHUB_OUTPUT
+          RAW_LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" || echo "default")
+          # Create a hash of the header string
+          HASH_LM=$(echo "$RAW_LM" | md5sum | cut -d' ' -f1)
+          echo "LAST_MODIFIED=$HASH_LM" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Cache iTerm2
