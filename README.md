@@ -1,4 +1,4 @@
-# Teraria Launcher v1.4.5: A tModLoader Instance Manager
+# Teraria Launcher v1.4.6: A tModLoader Instance Manager
 
 <table align="center">
   <tr style="background-color: #545454;">
