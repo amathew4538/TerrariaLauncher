@@ -8,7 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id("com.gradleup.shadow") version "9.4.0"
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 repositories {
@@ -26,10 +26,6 @@ dependencies {
     implementation libs.guava
 
     implementation 'com.formdev:flatlaf:3.7.1'
-
-    implementation('org.codehaus.plexus:plexus-utils:4.0.3') {
-        because 'Fixes CVE-2025-67030 directory traversal vulnerability'
-    }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
