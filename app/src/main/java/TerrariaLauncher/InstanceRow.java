@@ -73,12 +73,12 @@ public class InstanceRow extends JPanel {
         actionPanel.add(launchBtn);
 
         // Three Dots Menu Button
-        JButton menuBtn = new JButton("⋮");
+        JButton menuBtn = new JButton("\u22ee");
         menuBtn.setFocusPainted(false);
         menuBtn.setBorderPainted(false);
         menuBtn.setContentAreaFilled(false);
         menuBtn.setForeground(Color.WHITE);
-        menuBtn.setFont(new Font("SansSerif", Font.BOLD, 24)); // Slightly larger font for the dots
+        menuBtn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 24)); // Slightly larger font for the dots
         menuBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         if (isBase) {
