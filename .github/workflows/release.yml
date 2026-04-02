@@ -24,6 +24,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle' # <--- This speeds up subsequent runs significantly
 
       - name: Set Build Type and Version
         run: |
@@ -31,7 +32,7 @@ jobs:
           sed -i '' 's|\${version}|${{ steps.get_version.outputs.VERSION }}|g' app/src/main/resources/config.properties
 
       - name: Build ShadowJar
-        run: ./gradlew shadowJar
+        run: ./gradlew shadowJar --no-daemon
         env:
           APP_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
@@ -53,26 +54,50 @@ jobs:
             --copyright "Copyright 2026 amathew4538" \
             --description "A tModLoader Instance Manager"
 
+      - name: Get iTerm2 Metadata
+        id: iterm_meta
+        run: |
+          # Get the 'Last-Modified' date from the server headers
+          LM=$(curl -sI "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" | tr -d '\r')
+          echo "LAST_MODIFIED=$LM" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Cache iTerm2
+        id: cache-iterm
+        uses: actions/cache@v4
+        with:
+          path: iterm.zip
+          key: iterm2-stable-${{ steps.iterm_meta.outputs.LAST_MODIFIED }}
+
       - name: Bundle iTerm2 and License
         run: |
-          curl -L -f "https://iterm2.com/downloads/stable/latest" -o iterm.zip
-          unzip iterm.zip -d app_build/
+          # Only download if the cache missed
+          if [ ! -f iterm.zip ]; then
+            echo "Cache miss! Downloading latest iTerm2..."
+            curl -L -f "https://iterm2.getiterm2.com/downloads/stable/latest" -o iterm.zip
+          else
+            echo "Cache hit! Using cached iTerm2."
+          fi
+          unzip -q iterm.zip -d app_build/
           cp LICENSE app_build/LICENSE.txt
 
       - name: Create FixPermissions
         run: |
-          cat <<EOF > app_build/FixPermissions.command
+          cat <<'EOF' > app_build/FixPermissions.command
           #!/bin/bash
-          cd "\$(dirname "\$0")"
-          chmod +x TerrariaLauncher.app/Contents/MacOS/TerrariaLauncher
-          chmod +x iTerm.app/Contents/MacOS/iTerm2
-          echo "Permissions fixed! You can now run the launcher."
+          parent_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)
+          cd "$parent_path"
+          echo "Setting permissions for TerrariaLauncher..."
+          chmod -R +x TerrariaLauncher.app/
+          if [ -d "iTerm.app" ]; then
+            chmod -R +x iTerm.app/
+          fi
+          echo "Done! You can now close this window and launch the app."
           EOF
           chmod +x app_build/FixPermissions.command
 
       - name: Create macOS DMG
         run: |
-          # Create a DMG from the entire app_build folder
           hdiutil create -volname "TerrariaLauncher-${{ steps.get_version.outputs.VERSION }}" \
                          -srcfolder app_build \
                          -ov -format UDZO \
@@ -101,6 +126,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Set Build Type and Version (Windows)
         shell: powershell
@@ -110,7 +136,7 @@ jobs:
           (Get-Content $path) -replace '\$\{build.type\}', 'release' -replace '\$\{version\}', $val | Set-Content $path
 
       - name: Build ShadowJar
-        run: .\gradlew shadowJar
+        run: .\gradlew shadowJar --no-daemon
         env:
           APP_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
