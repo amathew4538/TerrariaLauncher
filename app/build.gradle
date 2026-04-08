@@ -26,6 +26,10 @@ dependencies {
     implementation libs.guava
 
     implementation 'com.formdev:flatlaf:3.7.1'
+
+
+    implementation "net.java.dev.jna:jna:5.13.0"
+    implementation "net.java.dev.jna:jna-platform:5.13.0"
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

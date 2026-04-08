@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
 
 public class ModCache {
 
     // The global path where tModLoader actually looks
     private static final String macGlobalPath = System.getProperty("user.home")
         + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
-    private static final String windowsGlobalPath = System.getProperty("user.home")
-        + "\\Documents\\My Games\\Terraria\\tModLoader\\Mods\\enabled.json";
+    private static final String windowsDocumentsPath = Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL);
+    private static final String windowsGlobalPath = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader-preview\\Mods\\enabled.json";
 
     /**
      * Swaps the enabled.json from the Instance into the Global folder.
@@ -38,8 +40,7 @@ public class ModCache {
             } catch (IOException e) {
                 System.err.println("ModCache Error (Load): " + e.getMessage());
             }
-        }
-        if (os.contains("win")) {
+        } else if (os.contains("win")) {
             File globalFile = new File(windowsGlobalPath);
             File instanceCache = new File(instanceDir, "enabled.json");
 
@@ -65,13 +66,25 @@ public class ModCache {
      * @apiNote Call this AFTER the game closes or when a Save trigger happens.
      */
     public static void saveInstanceMods(File instanceDir) {
-        File globalFile = new File(macGlobalPath);
+        String os = System.getProperty("os.name").toLowerCase();
+        // Select the correct path based on OS
+        String path = os.contains("mac") ? macGlobalPath : windowsGlobalPath;
+
+        File globalFile = new File(path);
         File instanceCache = new File(instanceDir, "enabled.json");
 
         try {
             if (globalFile.exists()) {
+                // Ensure the instance directory exists before copying into it
+                if (!instanceDir.exists()) {
+                    DebugLogger.log("Instance Directory not found");
+                    throw new IOException("No Instance Directory Found!");
+                }
+
                 Files.copy(globalFile.toPath(), instanceCache.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 DebugLogger.log("ModCache: Saved enabled.json for " + instanceDir.getName());
+            } else {
+                DebugLogger.log("ModCache: Global enabled.json not found at " + path);
             }
         } catch (IOException e) {
             System.err.println("ModCache Error (Save): " + e.getMessage());
