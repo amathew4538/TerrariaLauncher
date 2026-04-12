@@ -1,7 +1,10 @@
 package TerrariaLauncher;
 
 import javax.swing.*;
+
+import java.awt.Desktop;
 import java.io.File;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -236,5 +239,20 @@ public class LauncherUtils {
         if (name == null || name.isEmpty()) return name;
         String result = name.replaceAll("([a-z])([A-Z])", "$1 $2");
         return result.substring(0, 1).toUpperCase() + result.substring(1);
+    }
+
+    /**
+     * Opens URL in default browser if possible
+     * @param url the link
+     */
+    public static void openWebpage(String url) {
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(url));
+            }
+        } catch (Exception ex) {
+            DebugLogger.log("No Browser Found!");
+            DebugLogger.log(ex.getMessage());
+        }
     }
 }

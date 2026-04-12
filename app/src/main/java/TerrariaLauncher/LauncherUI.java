@@ -189,6 +189,13 @@ public class LauncherUI {
             }
         });
 
+        String creditsURL = "https://github.com/amathew4538/TerrariaLauncher/blob/main/CREDITS.md";
+        JButton creditsBtn = new JButton("Credits");
+        creditsBtn.setPreferredSize(new Dimension(200, 50));
+        creditsBtn.addActionListener(e -> {
+            LauncherUtils.openWebpage(creditsURL);
+        });
+
         JButton quitBtn = new JButton("Quit");
         quitBtn.setPreferredSize(new Dimension(200, 50));
         quitBtn.addActionListener(e -> System.exit(0));
@@ -203,8 +210,12 @@ public class LauncherUI {
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 110, 10, 10));
 
         JPanel btnWrapper = new JPanel();
+
         btnWrapper.setOpaque(false);
         btnWrapper.add(createBtn);
+        btnWrapper.add(Box.createHorizontalStrut(20));
+
+        btnWrapper.add(creditsBtn);
         btnWrapper.add(Box.createHorizontalStrut(20));
 
         btnWrapper.add(quitBtn);
