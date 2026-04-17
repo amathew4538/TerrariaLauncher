@@ -204,9 +204,13 @@ public class LauncherUI {
         versionLabel.setForeground(new Color(255, 255, 255, 255));
         versionLabel.setFont(versionLabel.getFont().deriveFont(24f));
 
+        JButton themeSwitcherBtn = new JButton("Switch theme");
+        quitBtn.setPreferredSize(new Dimension(200, 50));
+        themeSwitcherBtn.addActionListener(e -> ThemeManager.themeSwitcher());
+
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setOpaque(false);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 110, 10, 10));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         JPanel btnWrapper = new JPanel();
 
@@ -218,6 +222,7 @@ public class LauncherUI {
         btnWrapper.add(Box.createHorizontalStrut(20));
 
         btnWrapper.add(quitBtn);
+        bottomPanel.add(themeSwitcherBtn, BorderLayout.WEST);
         bottomPanel.add(btnWrapper, BorderLayout.CENTER);
         bottomPanel.add(versionLabel, BorderLayout.EAST);
 

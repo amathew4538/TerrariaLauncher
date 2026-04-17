@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.Frame;
 
 public class AutoUpdate {
     private static final String REPO_URL = "https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/latest";
@@ -87,7 +88,7 @@ public class AutoUpdate {
 
     public static void downloadAndInstall(String downloadUrl) {
         // Create Progress Window
-        JDialog progressDialog = new JDialog((java.awt.Frame)null, "Updating Terraria Launcher", true);
+        JDialog progressDialog = new JDialog((Frame)null, "Updating Terraria Launcher", true);
         JProgressBar progressBar = new JProgressBar(0, 100);
         JLabel statusLabel = new JLabel("Connecting to GitHub...");
 

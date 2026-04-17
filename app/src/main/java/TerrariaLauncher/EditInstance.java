@@ -214,7 +214,7 @@ public class EditInstance {
     }
 
     public static void createInstance(String instanceName, File selectedIcon, File rootDir, JPanel container) {
-        JDialog progressDialog = new JDialog((java.awt.Frame)null, "Creating Instance: " + instanceName, true);
+        JDialog progressDialog = new JDialog((Frame)null, "Creating Instance: " + instanceName, true);
         JProgressBar progressBar = new JProgressBar(0, 100);
         JLabel statusLabel = new JLabel("Fetching latest tModLoader...");
 

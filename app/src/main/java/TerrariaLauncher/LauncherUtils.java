@@ -270,4 +270,21 @@ public class LauncherUtils {
             DebugLogger.log(ex.getMessage());
         }
     }
+
+    /**
+     * Gets the config.txt file
+     * @return the config.txt as a File
+     */
+    public static File getConfigFile() {
+        File rootDir = new File(".");
+        try {
+            String path = LauncherUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            File jarFile = new File(path);
+            if (path.contains(".app")) {
+                // Move out of Contents/Java/ to the main folder
+                rootDir = jarFile.getParentFile().getParentFile().getParentFile().getParentFile();
+            }
+        } catch (Exception ignored) {}
+        return new File(rootDir, "config.txt");
+    }
 }

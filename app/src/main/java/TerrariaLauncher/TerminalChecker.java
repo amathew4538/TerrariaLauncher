@@ -1,10 +1,10 @@
 package TerrariaLauncher;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,26 +19,12 @@ public class TerminalChecker {
      * @apiNote Only runs if onfig.txt doesnt exist
      */
     public static void checkTerminalCompatibility() {
-        File rootDir;
-        try {
-            String path = TerrariaLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            File jarFile = new File(path);
-            if (path.contains(".app")) {
-                // Move out of Contents/Java/ to the main folder
-                rootDir = jarFile.getParentFile().getParentFile().getParentFile().getParentFile();
-            } else {
-                rootDir = new File(".");
-            }
-        } catch (Exception e) {
-            rootDir = new File(".");
-        }
+        final File configFile = LauncherUtils.getConfigFile();
 
-        final File finalRoot = rootDir;
-
-        File configFile = new File(finalRoot + "/config.txt");
-
-        // Only run this check if config.txt doesn't exist
+        // Check if config.txt doesn't exist
         if (configFile.exists()) return;
+
+        final File finalRoot = configFile.getParentFile();
 
         DebugLogger.log("First boot detected. Testing Terminal.app compatibility...");
 
@@ -75,11 +61,20 @@ public class TerminalChecker {
         }
 
         // Create config.txt
-        try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
-            writer.println("terminalWorks=" + terminalSuccess);
-            DebugLogger.log("Config saved: terminalWorks=" + terminalSuccess);
+        try {
+            List<String> lines = configFile.exists() ? Files.readAllLines(configFile.toPath()) : new ArrayList<>();
+            boolean found = false;
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith("terminalWorks=")) {
+                    lines.set(i, "terminalWorks=" + terminalSuccess);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) lines.add("terminalWorks=" + terminalSuccess);
+            Files.write(configFile.toPath(), lines);
         } catch (IOException e) {
-            e.printStackTrace();
+            DebugLogger.log("Error writing to config.txt: " + e.getMessage());
         }
 
         // If Terminal works, delete iTerm.app to save space

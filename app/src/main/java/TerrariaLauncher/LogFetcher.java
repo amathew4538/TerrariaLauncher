@@ -1,6 +1,7 @@
 package TerrariaLauncher;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -57,8 +58,8 @@ public class LogFetcher {
     private static JComponent createLogTextPane(File file) {
         JTextPane textPane = new JTextPane();
         textPane.setEditable(false);
-        textPane.setBackground(new java.awt.Color(30, 30, 30));
-        textPane.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+        textPane.setBackground(new Color(30, 30, 30));
+        textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
         StyledDocument doc = textPane.getStyledDocument();
     
