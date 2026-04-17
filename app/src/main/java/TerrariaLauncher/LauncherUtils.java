@@ -94,7 +94,7 @@ public class LauncherUtils {
 
                     if (useTerminal) {
                         DebugLogger.log("Config: Using Terminal.app");
-                        pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
+                        pb.command("/usr/bin/osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
                     } else if (iTerm.exists()) {
                         DebugLogger.log("iTerm.app FOUND. Sending Single-Window AppleScript...");
                         String appleScript = String.format(
@@ -109,10 +109,10 @@ public class LauncherUtils {
                             "    end tell\n" +
                             "end tell", iTerm.getAbsolutePath(), shellCmd);
 
-                        pb.command("osascript", "-e", appleScript);
+                        pb.command("/usr/bin/osascript", "-e", appleScript);
                     } else {
                         DebugLogger.log("iTerm.app NOT FOUND. Using Terminal.app fallback.");
-                        pb.command("osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
+                        pb.command("/usr/bin/osascript", "-e", "tell application \"Terminal\" to do script \"" + shellCmd + "\"");
                     }
 
                     pb.start();
@@ -150,9 +150,9 @@ public class LauncherUtils {
                                 Thread.sleep(15000); // Wait 15 seconds
                                 DebugLogger.log("Watcher: 15s elapsed. Sending quit command to iTerm...");
 
-                                // Use osascript to tell iTerm to quit
+                                // Use /usr/bin/osascript to tell iTerm to quit
                                 String closeScript = "tell application \"iTerm\" to quit";
-                                new ProcessBuilder("osascript", "-e", closeScript).start();
+                                new ProcessBuilder("/usr/bin/osascript", "-e", closeScript).start();
                             } catch (Exception e) {
                                 DebugLogger.log("Watcher Error (iTerm Close): " + e.getMessage());
                             }

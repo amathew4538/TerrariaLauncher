@@ -175,7 +175,9 @@ public class AutoUpdate {
                 writer.println("start \"\" \"" + installDir + "TerrariaLauncher.exe\"");
                 writer.println("del \"%~f0\"");
             }
-            Runtime.getRuntime().exec("cmd /c start update.bat");
+            String systemRoot = System.getenv("SystemRoot");
+            String cmdPath = (systemRoot != null && !systemRoot.isEmpty()) ? systemRoot + "\\System32\\cmd.exe" : "C:\\Windows\\System32\\cmd.exe";
+            new ProcessBuilder(cmdPath, "/c", "start", "", "\"" + batch.getAbsolutePath() + "\"").start();
             System.exit(0);
         }
     }

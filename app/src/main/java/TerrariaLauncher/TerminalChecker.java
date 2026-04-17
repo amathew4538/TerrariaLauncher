@@ -51,12 +51,12 @@ public class TerminalChecker {
                 DebugLogger.log("Running ls in Terminal");
                 // Tell Terminal to open, run 'ls', and then returns success if Terminal does
                 String script = "tell application \"Terminal\" to do script \"ls\"";
-                ProcessBuilder pb = new ProcessBuilder("osascript", "-e", script);
+                ProcessBuilder pb = new ProcessBuilder("/usr/bin/osascript", "-e", script);
 
                 Process p = pb.start();
                 int exitCode = p.waitFor();
 
-                // If osascript exits with 0, it means Terminal ran the command.
+                // If /usr/bin/osascript exits with 0, it means Terminal ran the command.
                 return exitCode == 0;
             };
             Future<Boolean> future = executor.submit(task);

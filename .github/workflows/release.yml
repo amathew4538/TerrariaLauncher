@@ -111,7 +111,7 @@ jobs:
                          TerrariaLauncher-macOS.dmg
 
       - name: Upload macOS Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0 of softprops' action-gh-release code
         with:
           files: TerrariaLauncher-macOS.dmg
         env:
@@ -170,7 +170,7 @@ jobs:
           Compress-Archive -Path app_build/TerrariaLauncher -DestinationPath TerrariaLauncher-Windows.zip
 
       - name: Upload Windows Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0 of softprops' action-gh-release code
         with:
           files: TerrariaLauncher-Windows.zip
         env:
