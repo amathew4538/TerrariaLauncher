@@ -69,7 +69,7 @@ jobs:
 
       - name: Cache iTerm2
         id: cache-iterm
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: iterm.zip
           key: iterm2-v1-${{ steps.iterm_meta.outputs.IT_HASH }}
