@@ -99,6 +99,12 @@ public class InstanceRow extends JPanel {
         });
         popup.add(statsItem);
 
+        JMenuItem logItem = new JMenuItem("Latest Logs");
+        logItem.addActionListener(e -> {
+            LogFetcher.showLogs(folderPath);
+        });
+        popup.add(logItem);
+
         JMenuItem editModsItem = new JMenuItem("Edit Mods");
         editModsItem.addActionListener(e -> {
             // Open the Mod Editor window for this specific folder
