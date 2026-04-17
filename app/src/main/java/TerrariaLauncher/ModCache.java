@@ -8,13 +8,6 @@ import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 
 public class ModCache {
-
-    // The global path where tModLoader actually looks
-    private static final String macGlobalPath = System.getProperty("user.home")
-        + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
-    private static final String windowsDocumentsPath = Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL);
-    private static final String windowsGlobalPath = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader-preview\\Mods\\enabled.json";
-
     /**
      * Swaps the enabled.json from the Instance into the Global folder.
      * @apiNote Call this RIGHT BEFORE launching the game.
@@ -23,6 +16,8 @@ public class ModCache {
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("mac")) {
+            final String macGlobalPath = System.getProperty("user.home")
+                + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
             File globalFile = new File(macGlobalPath);
             File instanceCache = new File(instanceDir, "enabled.json");
 
@@ -41,6 +36,8 @@ public class ModCache {
                 System.err.println("ModCache Error (Load): " + e.getMessage());
             }
         } else if (os.contains("win")) {
+                final String windowsDocumentsPath = Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL);
+                final String windowsGlobalPath = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader-preview\\Mods\\enabled.json";
             File globalFile = new File(windowsGlobalPath);
             File instanceCache = new File(instanceDir, "enabled.json");
 
@@ -67,8 +64,15 @@ public class ModCache {
      */
     public static void saveInstanceMods(File instanceDir) {
         String os = System.getProperty("os.name").toLowerCase();
+        String path;
         // Select the correct path based on OS
-        String path = os.contains("mac") ? macGlobalPath : windowsGlobalPath;
+        if (os.contains("mac")) {
+            path = System.getProperty("user.home")
+                + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
+        } else {
+            final String windowsDocumentsPath = Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL);
+            path = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader-preview\\Mods\\enabled.json";
+        }
 
         File globalFile = new File(path);
         File instanceCache = new File(instanceDir, "enabled.json");

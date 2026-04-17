@@ -167,7 +167,7 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 
 ## Footnotes
 
-<sup>1</sup> Testers needed.
+<sup>1</sup> Can't edit mods yet. Can't cache mod list yet.
 
 ***
 

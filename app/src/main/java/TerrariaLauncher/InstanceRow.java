@@ -89,6 +89,18 @@ public class InstanceRow extends JPanel {
         // Popup Menu logic
         JPopupMenu popup = new JPopupMenu();
 
+        JMenuItem statsItem = new JMenuItem("Statistics");
+        statsItem.addActionListener(e -> {
+            // Get stats for this specific folder
+            String stats = StatsManager.getStatsString(folderPath.toFile());
+
+            JOptionPane.showMessageDialog(this,
+                stats,
+                "Statistics: " + folderName,
+                JOptionPane.INFORMATION_MESSAGE);
+        });
+        popup.add(statsItem);
+
         JMenuItem editModsItem = new JMenuItem("Edit Mods");
         editModsItem.addActionListener(e -> {
             // Open the Mod Editor window for this specific folder

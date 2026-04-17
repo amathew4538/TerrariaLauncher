@@ -46,6 +46,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        queries: security-extended
 
     - name: Build with Gradle
       if: matrix.build-mode == 'manual'

@@ -21,6 +21,7 @@ public class LauncherUtils {
         DebugLogger.log("Starting launch for: " + folder.getName());
 
         ModCache.loadInstanceMods(folder);
+        DebugLogger.log("Mod cache restored.");
 
         if (folder.getName().equalsIgnoreCase("TerrariaLauncher.app") ||
             folder.getName().equalsIgnoreCase("iTerm.app") ||
@@ -139,6 +140,9 @@ public class LauncherUtils {
 
                     if (gameStarted) {
                         DebugLogger.log("Watcher: Game confirmed. iTerm will be closed in 15 seconds...");
+                        DebugLogger.log("Watcher: Starting time counter.");
+                        long startTime = System.currentTimeMillis();
+                        StatsManager.incrementLaunchCount(folder);
 
                         // Start a separate mini-thread to kill iTerm after 15 seconds
                         new Thread(() -> {
@@ -162,6 +166,14 @@ public class LauncherUtils {
 
                         DebugLogger.log("Watcher: Game exit detected. Saving Mod Cache...");
                         ModCache.saveInstanceMods(folder);
+
+                        DebugLogger.log("Watcher: Instance Mods saved. Saving stats.");
+                        long endTime = System.currentTimeMillis();
+                        long minutesPlayed = (endTime - startTime) / (1000 * 60);
+                        if (minutesPlayed >= 1) {
+                            StatsManager.addPlayTime(folder, minutesPlayed);
+                            DebugLogger.log("Watcher: Added " + minutesPlayed + "m to playtime.");
+                        }
 
                         DebugLogger.log("Watcher: Closing Launcher in 3s...");
                         Thread.sleep(3000);
