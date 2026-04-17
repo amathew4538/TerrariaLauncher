@@ -20,11 +20,22 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK 17
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0 of actions/setup-java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle' # <--- This speeds up subsequent runs significantly
+
+      - name: Cache Gradle packages
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 actions/cache
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          # This key stays the same as long as dependencies don't change
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          # This allows it to pull from the PREVIOUS release's cache
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Set Build Type and Version
         run: |
@@ -57,13 +68,15 @@ jobs:
       - name: Get iTerm2 Metadata
         id: iterm_meta
         run: |
-          # Fetch headers from the primary stable link
-          # Use -L to follow redirects and || echo to prevent script failure
-          RAW_LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" || echo "iterm2-default")
-          
-          # Convert the date string into a clean MD5 hash (removes commas/spaces automatically)
-          HASH_LM=$(echo "$RAW_LM" | md5sum | cut -d' ' -f1)
-          
+          # Use 'tr' to strip carriage returns (\r) which often break grep results from headers
+          RAW_LM=$(curl -sIL "https://iterm2.com/downloads/stable/latest" | grep -i "Last-Modified" | tr -d '\r' || echo "iterm2-default")
+
+          # If the header is empty, use a fallback to avoid a blank hash
+          if [ -z "$RAW_LM" ]; then RAW_LM="iterm2-default"; fi
+
+          # Generate hash from the cleaned string
+          HASH_LM=$(echo -n "$RAW_LM" | md5sum | cut -d' ' -f1)
+
           echo "IT_HASH=$HASH_LM" >> $GITHUB_OUTPUT
         shell: bash
 
@@ -72,7 +85,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 actions/cache
         with:
           path: iterm.zip
-          key: iterm2-v1-${{ steps.iterm_meta.outputs.IT_HASH }}
+          key: macos-iterm2-${{ steps.iterm_meta.outputs.IT_HASH }}
 
       - name: Bundle iTerm2 and License
         run: |
@@ -83,7 +96,7 @@ jobs:
           else
             echo "Cache hit! Using cached iterm.zip"
           fi
-          
+
           unzip -q iterm.zip -d app_build/
           cp LICENSE app_build/LICENSE.txt
         shell: bash
