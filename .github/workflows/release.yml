@@ -13,14 +13,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 of actions/checkout
 
       - name: Get Version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0 of actions/setup-java
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -69,7 +69,7 @@ jobs:
 
       - name: Cache iTerm2
         id: cache-iterm
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 actions/cache
         with:
           path: iterm.zip
           key: iterm2-v1-${{ steps.iterm_meta.outputs.IT_HASH }}
@@ -121,7 +121,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 of actions/checkout
 
       - name: Get Version
         id: get_version
@@ -129,7 +129,7 @@ jobs:
         shell: bash
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0 of actions/setup-java
         with:
           java-version: '17'
           distribution: 'temurin'
