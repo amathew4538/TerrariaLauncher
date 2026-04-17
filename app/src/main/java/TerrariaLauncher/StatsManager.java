@@ -11,7 +11,12 @@ public class StatsManager {
      */
     public static void incrementLaunchCount(File instanceFolder) {
         Properties prop = loadStats(instanceFolder);
-        int count = Integer.parseInt(prop.getProperty("launches", "0"));
+        int count = 0;
+        try {
+            count = Integer.parseInt(prop.getProperty("launches", "0"));
+        } catch (NumberFormatException e) {
+            DebugLogger.log("Invalid integer increment: " + e.getMessage());
+        }
         prop.setProperty("launches", String.valueOf(count + 1));
         saveStats(instanceFolder, prop);
     }
@@ -23,7 +28,14 @@ public class StatsManager {
      */
     public static void addPlayTime(File instanceFolder, long minutes) {
         Properties prop = loadStats(instanceFolder);
-        long total = Long.parseLong(prop.getProperty("playtime", "0"));
+        long total = 0;
+
+        try {
+            total = Long.parseLong(prop.getProperty("playtime", "0"));
+        } catch (NumberFormatException e) {
+            DebugLogger.log("Invalid playtime value input: " + e.getMessage());
+        }
+
         prop.setProperty("playtime", String.valueOf(total + minutes));
         saveStats(instanceFolder, prop);
     }
@@ -36,7 +48,12 @@ public class StatsManager {
      */
     public static String getStatsString(File instanceFolder) {
         Properties prop = loadStats(instanceFolder);
-        long totalMins = Long.parseLong(prop.getProperty("playtime", "0"));
+        long totalMins = 0;
+        try {
+            totalMins = Long.parseLong(prop.getProperty("playtime", "0"));
+        } catch (NumberFormatException e) {
+            DebugLogger.log("Invalid playtime value in stats file: " + e.getMessage());
+        }
         String launches = prop.getProperty("launches", "0");
         
         long hours = totalMins / 60;

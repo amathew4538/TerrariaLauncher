@@ -30,7 +30,7 @@ public class TerrariaLauncher {
 
         JPanel headerPanel = LauncherUI.createHeaderPanel();
 
-        JPanel headerWrapper = LauncherUI.createHeaderWrapper(finalLocation);
+        JPanel headerWrapper = LauncherUI.createHeaderWrapper();
         DebugLogger.log("Instance Panel Created");
 
         JPanel instancePanel = LauncherUI.createInstancePanel(headerWrapper, headerPanel, finalLocation);

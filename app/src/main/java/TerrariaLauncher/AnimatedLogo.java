@@ -15,7 +15,7 @@ public class AnimatedLogo extends JComponent {
      * @param resourcePath path to image
      */
     public AnimatedLogo(String resourcePath) {
-        java.net.URL imgUrl = getClass().getResource(resourcePath);
+        java.net.URL imgUrl = AnimatedLogo.class.getResource(resourcePath);
         if (imgUrl != null) {
             this.logoImage = new ImageIcon(imgUrl).getImage();
         }

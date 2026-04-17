@@ -2,8 +2,6 @@ package TerrariaLauncher;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.nio.file.Path;
 import com.formdev.flatlaf.ui.FlatLineBorder;
@@ -39,7 +37,7 @@ public class InstanceRow extends JPanel {
         // Icon Logic
         ImageIcon displayIcon = null;
         if (isBase) {
-            URL baseIconUrl = getClass().getResource("/Terraria.png");
+            URL baseIconUrl = InstanceRow.class.getResource("/Terraria.png");
             if (baseIconUrl != null) displayIcon = new ImageIcon(baseIconUrl);
         } else {
             java.io.File localIcon = new java.io.File(folderPath.toFile(), "icon.png");
@@ -47,7 +45,7 @@ public class InstanceRow extends JPanel {
         }
 
         if (displayIcon == null || displayIcon.getImage() == null) {
-            URL fallback = getClass().getResource("/Terraria.png");
+            URL fallback = InstanceRow.class.getResource("/Terraria.png");
             if(fallback != null) displayIcon = new ImageIcon(fallback);
         }
 
@@ -124,17 +122,5 @@ public class InstanceRow extends JPanel {
 
         actionPanel.add(menuBtn);
         add(actionPanel, BorderLayout.EAST);
-
-        // Hover Logic
-        addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                putClientProperty("FlatLaf.style", "arc: 20; background: rgba(50, 60, 100, 255)");
-                repaint();
-            }
-            public void mouseExited(MouseEvent e) {
-                putClientProperty("FlatLaf.style", "arc: 20; background: rgba(30, 35, 60, 200)");
-                repaint();
-            }
-        });
     }
 }

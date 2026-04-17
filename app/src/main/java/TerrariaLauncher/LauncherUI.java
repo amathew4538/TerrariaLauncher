@@ -101,11 +101,10 @@ public class LauncherUI {
 
     /**
      * Creates the wrapper for the instances and header panels
-     * @param finalLocation the root folder
      * @return the header wrapper, JPanel
      * @apiNote Called in {@link TerrariaLauncher#TerrariaLauncher()}
      */
-    public static JPanel createHeaderWrapper(File finalLocation) {
+    public static JPanel createHeaderWrapper() {
         JPanel headerWrapper = new JPanel();
         headerWrapper.setOpaque(false);
 

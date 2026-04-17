@@ -15,7 +15,7 @@ public class ThemeManager {
     public static void applyTheme() {
         try {
             UIManager.setLookAndFeel(new FlatMacDarkLaf());
-            URL fontUrl = TerrariaLauncher.class.getResource("/Andy-Bold.ttf");
+            URL fontUrl = ThemeManager.class.getResource("/Andy-Bold.ttf");
             if (fontUrl != null) {
                 Font andyFont = Font.createFont(Font.TRUETYPE_FONT, fontUrl.openStream());
                 GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(andyFont);

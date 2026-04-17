@@ -17,3 +17,6 @@ bin
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Extras
+flatlaf-demo-3.7.1.jar
