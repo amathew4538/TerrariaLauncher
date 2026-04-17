@@ -2,13 +2,14 @@ package TerrariaLauncher;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import com.formdev.flatlaf.ui.FlatLineBorder;
 
 public class InstanceRow extends JPanel {
     private JPanel parentContainer;
-    private java.io.File rootDir;
+    private File rootDir;
 
     /**
      * Adds an instance to the row of instances
@@ -17,9 +18,9 @@ public class InstanceRow extends JPanel {
      * @param isBase whether it is base Terraria or not
      * @param container the JPanel to add the instance to0
      * @param root the root directory (folder the app is in)
-     * @apiNote This gets called in {@link LauncherUtils#scanAndPopulate(JPanel, java.io.File) LauncherUtils.scanAndPopulate()}
+     * @apiNote This gets called in {@link LauncherUtils#scanAndPopulate(JPanel, File) LauncherUtils.scanAndPopulate()}
      */
-    public InstanceRow(String folderName, Path folderPath, boolean isBase, JPanel container, java.io.File root) {
+    public InstanceRow(String folderName, Path folderPath, boolean isBase, JPanel container, File root) {
         this.parentContainer = container;
         this.rootDir = root;
 
@@ -40,7 +41,7 @@ public class InstanceRow extends JPanel {
             URL baseIconUrl = InstanceRow.class.getResource("/Terraria.png");
             if (baseIconUrl != null) displayIcon = new ImageIcon(baseIconUrl);
         } else {
-            java.io.File localIcon = new java.io.File(folderPath.toFile(), "icon.png");
+            File localIcon = new File(folderPath.toFile(), "icon.png");
             if (localIcon.exists()) displayIcon = new ImageIcon(localIcon.getAbsolutePath());
         }
 

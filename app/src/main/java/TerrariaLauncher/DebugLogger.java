@@ -2,6 +2,9 @@ package TerrariaLauncher;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.InputStream;
+import java.util.Properties;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,8 +19,8 @@ public class DebugLogger {
      * @return false if release, else true
      */
     public static boolean checkDebugStatus() {
-        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            java.util.Properties prop = new java.util.Properties();
+        try (InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
+            Properties prop = new Properties();
             if (input == null) return true; // Default to debug if file is missing
 
             prop.load(input);
@@ -70,8 +73,8 @@ public class DebugLogger {
      * Get the app version from config.properties
      */
     public static String getAppVersion() {
-        try (java.io.InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            java.util.Properties prop = new java.util.Properties();
+        try (InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
+            Properties prop = new Properties();
             if (input == null) return "Dev-Build";
 
             prop.load(input);

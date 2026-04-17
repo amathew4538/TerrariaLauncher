@@ -3,6 +3,7 @@ package TerrariaLauncher;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.net.URL;
@@ -64,7 +65,7 @@ public class RefreshButton extends JButton {
         int h = image.getHeight(null);
         if (w <= 0 || h <= 0) return image;
 
-        java.awt.image.BufferedImage buffered = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        BufferedImage buffered = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = buffered.createGraphics();
         g.drawImage(image, 0, 0, null);
         g.dispose();
@@ -72,9 +73,9 @@ public class RefreshButton extends JButton {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 int rgba = buffered.getRGB(x, y);
-                java.awt.Color col = new java.awt.Color(rgba, true);
+                Color col = new Color(rgba, true);
                 // Invert RGB but keep Alpha (transparency)
-                col = new java.awt.Color(255 - col.getRed(), 255 - col.getGreen(), 255 - col.getBlue(), col.getAlpha());
+                col = new Color(255 - col.getRed(), 255 - col.getGreen(), 255 - col.getBlue(), col.getAlpha());
                 buffered.setRGB(x, y, col.getRGB());
             }
         }

@@ -3,6 +3,7 @@ package TerrariaLauncher;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.net.URL;
 
 public class AnimatedLogo extends JComponent {
     private Image logoImage;
@@ -15,7 +16,7 @@ public class AnimatedLogo extends JComponent {
      * @param resourcePath path to image
      */
     public AnimatedLogo(String resourcePath) {
-        java.net.URL imgUrl = AnimatedLogo.class.getResource(resourcePath);
+        URL imgUrl = AnimatedLogo.class.getResource(resourcePath);
         if (imgUrl != null) {
             this.logoImage = new ImageIcon(imgUrl).getImage();
         }

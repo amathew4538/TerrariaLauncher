@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -326,7 +327,7 @@ public class EditInstance {
             
                 if (selectedIcon != null && selectedIcon.exists()) {
                     File destIcon = new File(newFolder, "icon.png");
-                    Files.copy(selectedIcon.toPath(), destIcon.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(selectedIcon.toPath(), destIcon.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             
                 tempZip.delete();
