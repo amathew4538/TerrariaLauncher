@@ -1,0 +1,23 @@
+version: 2
+updates:
+    # Monitor GitHub Actions (Crucial for SHA pinning)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+        interval: "weekly"
+    # Keep the SHAs updated while preserving your comments
+    commit-message:
+        prefix: "actions"
+        include: "scope"
+    # Monitor Gradle Dependencies (Java/Kotlin libraries)
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+        interval: "weekly"
+    # This helps catch security vulnerabilities in libraries like FlatLaf or Jackson
+    open-pull-requests-limit: 5
+    # Monitor GitHub Actions Metadata (If you use custom actions)
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+        interval: "monthly"

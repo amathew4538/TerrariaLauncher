@@ -60,8 +60,11 @@ public class LauncherUtils {
                     "echo Launcher: Game initialized. This window will close automatically. && " +
                     "timeout /t 5 >nul && exit",
                     binary, binary);
-                
-                pb.command("cmd", "/c", "start", "cmd", "/c", winShellCmd);
+
+                String systemRoot = System.getenv("SystemRoot");
+                String cmdPath = (systemRoot != null && !systemRoot.isEmpty()) ? systemRoot + "\\System32\\cmd.exe" : "C:\\Windows\\System32\\cmd.exe";
+                pb.command(cmdPath, "/c", "start", "cmd", "/c", winShellCmd);
+
                 pb.start();
             } else if (os.contains("mac")) {
                 DebugLogger.log("Platform: macOS detected.");
@@ -119,7 +122,7 @@ public class LauncherUtils {
                     DebugLogger.log("Process started successfully.");
                 } else if (folder.getName().endsWith(".app")) {
                     DebugLogger.log("Base App detected. Using 'open' command.");
-                    pb.command("open", "-a", folder.getAbsolutePath());
+                    pb.command("/usr/bin/open", "-a", folder.getAbsolutePath());
                     pb.start();
                 }
             }

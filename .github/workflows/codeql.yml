@@ -31,22 +31,22 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 of actions/checkout
 
     - name: Set up JDK 17
       if: matrix.language == 'java-kotlin'
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0 of actions/setup-java
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: 'gradle'
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@65216971a11ded447a6b76263d5a144519e5eee1 # v2.25.0 of github/codeql-action
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        queries: security-extended
+        queries: security-and-quality
 
     - name: Build with Gradle
       if: matrix.build-mode == 'manual'
@@ -56,6 +56,6 @@ jobs:
         ./gradlew shadowJar
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@65216971a11ded447a6b76263d5a144519e5eee1 # v2.25.0 of github/codeql-action
       with:
         category: "/language:${{matrix.language}}"
