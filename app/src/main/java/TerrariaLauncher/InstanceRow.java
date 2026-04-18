@@ -100,7 +100,7 @@ public class InstanceRow extends JPanel {
         });
         popup.add(statsItem);
 
-        JMenuItem logItem = new JMenuItem("Latest Logs");
+        JMenuItem logItem = new JMenuItem("View Logs");
         logItem.addActionListener(e -> {
             LogFetcher.showLogs(folderPath);
         });

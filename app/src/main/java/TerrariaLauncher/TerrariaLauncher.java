@@ -50,7 +50,7 @@ public class TerrariaLauncher {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
 
-        AutoUpdate.handleUpdates(DebugLogger.getAppVersion());
+        AutoUpdate.checkForUpdates(DebugLogger.getAppVersion());
     }
     public static void main(String[] args) {
         DebugLogger.initDebugWindow();

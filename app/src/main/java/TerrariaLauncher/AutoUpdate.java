@@ -11,7 +11,6 @@ public class AutoUpdate {
     private static final String REPO_URL = "https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/latest";
 
     public static void checkForUpdates(String currentVersion) {
-        // Don't run update check if it's a vDev-Build
         if ("Dev-Build".equals(currentVersion)) {
             DebugLogger.log("Development build detected. Skipping update check.");
             return;
@@ -36,49 +35,43 @@ public class AutoUpdate {
                 rd.close();
 
                 String json = result.toString();
-
-                // Parse latest tag version
                 String latestTag = json.split("\"tag_name\":\"")[1].split("\"")[0];
                 String cleanLatest = latestTag.replace("v", "");
-                DebugLogger.log("Latest on GitHub: " + cleanLatest);
 
                 if (!cleanLatest.equals(currentVersion)) {
-                    // Find the macOS Asset URL specifically
+                    String os = System.getProperty("os.name").toLowerCase();
+                    String targetAsset = os.contains("mac") ? "TerrariaLauncher-macOS.dmg" : "TerrariaLauncher-Windows.zip";
                     String downloadUrl = "";
-                    String[] assetBlocks = json.split("\\{\"url\":\"https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/assets/");
 
-                    for (String block : assetBlocks) {
-                        if (block.contains("TerrariaLauncher-macOS.zip")) {
+                    // Parsing for the specific asset
+                    String[] assets = json.split("\\{\"url\":\"https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/assets/");
+                    for (String asset : assets) {
+                        if (asset.contains(targetAsset)) {
                             String marker = "\"browser_download_url\":\"";
-                            int start = block.indexOf(marker);
-                            if (start != -1) {
-                                start += marker.length();
-                                int end = block.indexOf("\"", start);
-                                downloadUrl = block.substring(start, end);
-                                break;
-                            }
+                            int start = asset.indexOf(marker) + marker.length();
+                            int end = asset.indexOf("\"", start);
+                            downloadUrl = asset.substring(start, end);
+                            break;
                         }
                     }
 
                     if (downloadUrl.isEmpty()) {
-                        DebugLogger.log("ERROR: Could not find TerrariaLauncher-macOS.zip in assets.");
+                        DebugLogger.log("ERROR: Could not find " + targetAsset + " in assets.");
                         return;
                     }
 
                     final String finalUrl = downloadUrl;
+                    final String extension = targetAsset.endsWith(".dmg") ? ".dmg" : ".zip";
 
-                    // Show confirmation popup on the UI thread
                     SwingUtilities.invokeLater(() -> {
                         int choice = JOptionPane.showConfirmDialog(null,
                             "New version " + latestTag + " is available! Update now?",
                             "Update Found", JOptionPane.YES_NO_OPTION);
                         
                         if (choice == JOptionPane.YES_OPTION) {
-                            new Thread(() -> downloadAndInstall(finalUrl)).start();
+                            new Thread(() -> downloadAndInstall(finalUrl, extension)).start();
                         }
                     });
-                } else {
-                    DebugLogger.log("App is up to date.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -86,8 +79,7 @@ public class AutoUpdate {
         }).start();
     }
 
-    public static void downloadAndInstall(String downloadUrl) {
-        // Create Progress Window
+    public static void downloadAndInstall(String downloadUrl, String extension) {
         JDialog progressDialog = new JDialog((Frame)null, "Updating Terraria Launcher", true);
         JProgressBar progressBar = new JProgressBar(0, 100);
         JLabel statusLabel = new JLabel("Connecting to GitHub...");
@@ -101,13 +93,14 @@ public class AutoUpdate {
 
         new Thread(() -> {
             try {
-                File tempZip = new File(System.getProperty("user.home") + "/Downloads/TerrariaUpdate.zip");
+                // Save to temp file with correct extension
+                File tempFile = File.createTempFile("TerrariaUpdate", extension);
                 URL url = new URL(downloadUrl);
                 HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
                 long fileSize = httpConn.getContentLengthLong();
 
                 try (InputStream in = httpConn.getInputStream();
-                     FileOutputStream out = new FileOutputStream(tempZip)) {
+                     FileOutputStream out = new FileOutputStream(tempFile)) {
                     
                     byte[] buffer = new byte[8192];
                     int bytesRead;
@@ -117,7 +110,6 @@ public class AutoUpdate {
                         out.write(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
                         int percent = (int) ((totalBytesRead * 100) / fileSize);
-                        
                         SwingUtilities.invokeLater(() -> {
                             statusLabel.setText("Downloading: " + percent + "%");
                             progressBar.setValue(percent);
@@ -127,7 +119,7 @@ public class AutoUpdate {
 
                 SwingUtilities.invokeLater(() -> statusLabel.setText("Installing... App will restart shortly."));
                 Thread.sleep(1000);
-                handleHandoff(tempZip);
+                handleHandoff(tempFile);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,28 +131,22 @@ public class AutoUpdate {
         progressDialog.setVisible(true);
     }
 
-    private static void handleHandoff(File tempZip) throws IOException {
+    private static void handleHandoff(File updateFile) throws IOException {
         String os = System.getProperty("os.name").toLowerCase();
-        String installDir = System.getProperty("user.home") + "/Applications/Terraria/";
+        String installDir = System.getProperty("user.home") + (os.contains("mac") ? "/Applications/Terraria/" : "/Documents/Terraria/");
 
         if (os.contains("mac")) {
-            String stageDir = installDir + "update_stage/";
-
-            // Deletes iTerm
-            // Unzips to a temp directory
-            // Finds the .apps inside that folder and moves them up
-            // Fixes permissions and quarantine, then launches
+            // DMG Mounting logic
             String script = String.format(
-                "mkdir -p '%1$s' '%2$s' && sleep 2 && " +
-                "rm -rf '%1$sTerrariaLauncher.app' '%1$siTerm.app' && " +
-                "unzip -o '%3$s' -d '%2$s' > /dev/null && " +
-                "find '%2$s' -name '*.app' -maxdepth 2 -exec cp -R {} '%1$s' \\; && " + 
-                "chmod +x '%1$sTerrariaLauncher.app/Contents/MacOS/TerrariaLauncher' && " +
-                "chmod +x '%1$siTerm.app/Contents/MacOS/iTerm2' 2>/dev/null || true && " +
-                "xattr -rd com.apple.quarantine '%1$sTerrariaLauncher.app' 2>/dev/null || true && " +
-                "rm -rf '%2$s' '%3$s' && " +
-                "open '%1$sTerrariaLauncher.app'",
-                installDir, stageDir, tempZip.getAbsolutePath()
+                "sleep 2 && " +
+                "hdiutil attach '%s' -mountpoint /Volumes/TerrariaUpdate -nobrowse && " +
+                "rm -rf '%sTerrariaLauncher.app' '%siTerm.app' && " +
+                "cp -R /Volumes/TerrariaUpdate/*.app '%s' && " +
+                "hdiutil detach /Volumes/TerrariaUpdate && " +
+                "xattr -rd com.apple.quarantine '%s' && " +
+                "rm -f '%s' && " +
+                "open '%sTerrariaLauncher.app'",
+                updateFile.getAbsolutePath(), installDir, installDir, installDir, installDir, updateFile.getAbsolutePath(), installDir
             );
 
             String[] cmd = { "/bin/sh", "-c", "nohup " + script + " > /dev/null 2>&1 &" };
@@ -168,31 +154,21 @@ public class AutoUpdate {
             System.exit(0);
 
         } else if (os.contains("win")) {
-            File batch = new File("update.bat");
+            File batch = new File(System.getProperty("java.io.tmpdir"), "update.bat");
             try (PrintWriter writer = new PrintWriter(batch)) {
                 writer.println("@echo off");
-                writer.println("timeout /t 2 /nobreak");
-                writer.println("powershell -Command \"Expand-Archive -Path '" + tempZip.getAbsolutePath() + "' -DestinationPath '" + installDir + "' -Force\"");
+                writer.println("timeout /t 2 /nobreak > nul");
+                // Remove old runtime and app folders to prevent conflicts
+                writer.println("if exist \"" + installDir + "app\" rd /s /q \"" + installDir + "app\"");
+                writer.println("if exist \"" + installDir + "runtime\" rd /s /q \"" + installDir + "runtime\"");
+                // Extract new files
+                writer.println("powershell -Command \"Expand-Archive -Path '" + updateFile.getAbsolutePath() + "' -DestinationPath '" + installDir + "' -Force\"");
                 writer.println("start \"\" \"" + installDir + "TerrariaLauncher.exe\"");
+                writer.println("del \"" + updateFile.getAbsolutePath() + "\"");
                 writer.println("del \"%~f0\"");
             }
-            String systemRoot = System.getenv("SystemRoot");
-            String cmdPath = (systemRoot != null && !systemRoot.isEmpty()) ? systemRoot + "\\System32\\cmd.exe" : "C:\\Windows\\System32\\cmd.exe";
-            new ProcessBuilder(cmdPath, "/c", "start", "", "\"" + batch.getAbsolutePath() + "\"").start();
+            new ProcessBuilder("cmd.exe", "/c", "start", "/min", "", batch.getAbsolutePath()).start();
             System.exit(0);
-        }
-    }
-
-
-    /**
-     * Handle auto-updating based on version
-     * @param version the version string
-     */
-    public static void handleUpdates(String version) {
-        if (!version.equals("Dev-Build")) {
-            AutoUpdate.checkForUpdates(version);
-        } else {
-            DebugLogger.log("Running in Dev Mode: Skipping Auto-Update.");
         }
     }
 }

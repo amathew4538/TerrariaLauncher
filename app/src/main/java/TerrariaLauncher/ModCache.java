@@ -64,14 +64,14 @@ public class ModCache {
      */
     public static void saveInstanceMods(File instanceDir) {
         String os = System.getProperty("os.name").toLowerCase();
-        String path;
+        String path = "/FakePath/ThrowErrorPls";
         // Select the correct path based on OS
         if (os.contains("mac")) {
             path = System.getProperty("user.home")
-                + "/Library/Application Support/Terraria/tModLoader-preview/Mods/enabled.json";
-        } else {
+                + "/Library/Application Support/Terraria/tModLoader/Mods/enabled.json";
+        } else if (os.contains("win")){
             final String windowsDocumentsPath = Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL);
-            path = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader-preview\\Mods\\enabled.json";
+            path = windowsDocumentsPath + "\\My Games\\Terraria\\tModLoader\\Mods\\enabled.json";
         }
 
         File globalFile = new File(path);
