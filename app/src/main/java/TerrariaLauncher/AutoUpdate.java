@@ -172,20 +172,25 @@ public class AutoUpdate {
      */
     private static void handleHandoff(File updateFile) throws IOException {
         String os = System.getProperty("os.name").toLowerCase();
-        String installDir = System.getProperty("user.home") + (os.contains("mac") ? "/Applications/Terraria/" : "/Documents/Terraria/");
+        String userHome = System.getProperty("user.home");
 
         if (os.contains("mac")) {
-            // DMG Mounting logic
+            // Path: /Users/username/Applications/Terraria/
+            String installDir = userHome + "/Applications/Terraria/";
+            
             String script = String.format(
                 "sleep 2 && " +
-                "hdiutil attach '%s' -mountpoint /Volumes/TerrariaUpdate -nobrowse && " +
-                "rm -rf '%sTerrariaLauncher.app' '%siTerm.app' && " +
-                "cp -R /Volumes/TerrariaUpdate/*.app '%s' && " +
-                "hdiutil detach /Volumes/TerrariaUpdate && " +
-                "xattr -rd com.apple.quarantine '%s' && " +
-                "rm -f '%s' && " +
-                "open '%sTerrariaLauncher.app'",
-                updateFile.getAbsolutePath(), installDir, installDir, installDir, installDir, updateFile.getAbsolutePath(), installDir
+                "mkdir -p '%2$s' && " +
+                "MOUNT_DIR=$(hdiutil attach '%1$s' -nobrowse | awk '/\\/Volumes/ {print $3}') && " +
+                "if [ -n \"$MOUNT_DIR\" ]; then " +
+                "  rm -rf '%2$sTerrariaLauncher.app' '%2$siTerm.app' && " +
+                "  rsync -a \"$MOUNT_DIR/\"*.app '%2$s' && " +
+                "  hdiutil detach \"$MOUNT_DIR\"; " +
+                "fi && " +
+                "xattr -rd com.apple.quarantine '%2$s' 2>/dev/null || true && " +
+                "rm -f '%1$s' && " +
+                "open '%2$sTerrariaLauncher.app'",
+                updateFile.getAbsolutePath(), installDir
             );
 
             String[] cmd = { "/bin/sh", "-c", "nohup " + script + " > /dev/null 2>&1 &" };
@@ -193,25 +198,27 @@ public class AutoUpdate {
             System.exit(0);
 
         } else if (os.contains("win")) {
+            // Path: C:\Users\\username\Documents\Terraria\
+            String installDir = userHome + "\\Documents\\Terraria\\";
             File batch = new File(System.getProperty("java.io.tmpdir"), "update.bat");
+            
             try (PrintWriter writer = new PrintWriter(batch)) {
                 writer.println("@echo off");
                 writer.println("timeout /t 2 /nobreak > nul");
-                // Remove old runtime and app folders to prevent conflicts
+                writer.println("if not exist \"" + installDir + "\" mkdir \"" + installDir + "\"");
+                // Remove old folders to ensure a clean slate for 'app' and 'runtime'
                 writer.println("if exist \"" + installDir + "app\" rd /s /q \"" + installDir + "app\"");
                 writer.println("if exist \"" + installDir + "runtime\" rd /s /q \"" + installDir + "runtime\"");
-                // Extract new files
+                // Extract zip and restart
                 writer.println("powershell -Command \"Expand-Archive -Path '" + updateFile.getAbsolutePath() + "' -DestinationPath '" + installDir + "' -Force\"");
                 writer.println("start \"\" \"" + installDir + "TerrariaLauncher.exe\"");
                 writer.println("del \"" + updateFile.getAbsolutePath() + "\"");
                 writer.println("del \"%~f0\"");
             }
+            
             String systemRoot = System.getenv("SystemRoot");
-            if (systemRoot == null || systemRoot.trim().isEmpty()) {
-                systemRoot = "C:\\Windows";
-            }
-            String cmdPath = systemRoot + "\\System32\\cmd.exe";
-            new ProcessBuilder(cmdPath, "/c", "start", "/min", "", batch.getAbsolutePath()).start();
+            if (systemRoot == null) systemRoot = "C:\\Windows";
+            new ProcessBuilder(systemRoot + "\\System32\\cmd.exe", "/c", "start", "/min", "", batch.getAbsolutePath()).start();
             System.exit(0);
         }
     }
