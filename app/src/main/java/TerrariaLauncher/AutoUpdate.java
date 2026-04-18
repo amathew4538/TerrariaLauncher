@@ -121,12 +121,28 @@ public class AutoUpdate {
                 } else {
                     tempPath = Files.createTempFile("TerrariaUpdate", extension);
                     File temp = tempPath.toFile();
-                    temp.setReadable(false, false);
-                    temp.setWritable(false, false);
-                    temp.setExecutable(false, false);
-                    temp.setReadable(true, true);
-                    temp.setWritable(true, true);
+                    if (!temp.setReadable(false, false)) {
+                        DebugLogger.log("Failed to clear read permissions on temp file: " + temp.getAbsolutePath());
+                        throw new IOException("Failed to clear read permissions on temp file: " + temp.getAbsolutePath());
+                    }
+                    if (!temp.setWritable(false, false)) {
+                        DebugLogger.log("Failed to clear write permissions on temp file: " + temp.getAbsolutePath());
+                        throw new IOException("Failed to clear write permissions on temp file: " + temp.getAbsolutePath());
+                    }
+                    if (!temp.setExecutable(false, false)) {
+                        DebugLogger.log("Failed to clear execute permissions on temp file: " + temp.getAbsolutePath());
+                        throw new IOException("Failed to clear execute permissions on temp file: " + temp.getAbsolutePath());
+                    }
+                    if (!temp.setReadable(true, true)) {
+                        DebugLogger.log("Failed to set owner read permission on temp file: " + temp.getAbsolutePath());
+                        throw new IOException("Failed to set owner read permission on temp file: " + temp.getAbsolutePath());
+                    }
+                    if (!temp.setWritable(true, true)) {
+                        DebugLogger.log("Failed to set owner write permission on temp file: " + temp.getAbsolutePath());
+                        throw new IOException("Failed to set owner write permission on temp file: " + temp.getAbsolutePath());
+                    }
                 }
+
                 File tempFile = tempPath.toFile();
 
                 URL url = new URL(downloadUrl);
@@ -177,7 +193,7 @@ public class AutoUpdate {
         if (os.contains("mac")) {
             // Path: /Users/username/Applications/Terraria/
             String installDir = userHome + "/Applications/Terraria/";
-            
+
             String script = String.format(
                 "sleep 2 && " +
                 "mkdir -p '%2$s' && " +
@@ -217,8 +233,20 @@ public class AutoUpdate {
             }
             
             String systemRoot = System.getenv("SystemRoot");
-            if (systemRoot == null) systemRoot = "C:\\Windows";
-            new ProcessBuilder(systemRoot + "\\System32\\cmd.exe", "/c", "start", "/min", "", batch.getAbsolutePath()).start();
+            if (systemRoot == null || systemRoot.isEmpty()) systemRoot = "C:\\Windows";
+            
+            String cmdPath = systemRoot + "\\System32\\cmd.exe";
+
+            ProcessBuilder pb = new ProcessBuilder(
+                cmdPath, 
+                "/c", 
+                "start", 
+                "/min", 
+                "", 
+                batch.getAbsolutePath()
+            );
+
+            pb.start();
             System.exit(0);
         }
     }
