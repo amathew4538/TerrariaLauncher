@@ -232,14 +232,19 @@ public class AutoUpdate {
                 writer.println("del \"%~f0\"");
             }
             
-            String systemRoot = System.getenv("SystemRoot");
-            if (systemRoot == null || systemRoot.isEmpty()) systemRoot = "C:\\Windows";
+            String systemRootStr = System.getenv("SystemRoot");
+            if (systemRootStr == null || systemRootStr.isEmpty()) {
+                systemRootStr = "C:\\Windows";
+            }
             
-            String cmdPath = systemRoot + "\\System32\\cmd.exe";
+            File systemRoot = new File(systemRootStr);
+            File system32 = new File(systemRoot, "System32");
+            File cmdExe = new File(system32, "cmd.exe");
 
+            // Pass the absolute path directly to the ProcessBuilder (fixes CWE-78/88????).
             ProcessBuilder pb = new ProcessBuilder(
-                cmdPath, 
-                "/c", 
+                cmdExe.getAbsolutePath(), 
+                "/c",
                 "start", 
                 "/min", 
                 "", 
