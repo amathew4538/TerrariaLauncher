@@ -3,6 +3,12 @@ package TerrariaLauncher;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.EnumSet;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -10,6 +16,10 @@ import java.awt.Frame;
 public class AutoUpdate {
     private static final String REPO_URL = "https://api.github.com/repos/amathew4538/TerrariaLauncher/releases/latest";
 
+    /**
+     * Checks version and starts updates
+     * @param currentVersion the version the app is
+     */
     public static void checkForUpdates(String currentVersion) {
         if ("Dev-Build".equals(currentVersion)) {
             DebugLogger.log("Development build detected. Skipping update check.");
@@ -79,6 +89,11 @@ public class AutoUpdate {
         }).start();
     }
 
+    /**
+     * Download and install the new app
+     * @param downloadUrl url to the dmg/zip
+     * @param extension dmg or zip
+     */
     public static void downloadAndInstall(String downloadUrl, String extension) {
         JDialog progressDialog = new JDialog((Frame)null, "Updating Terraria Launcher", true);
         JProgressBar progressBar = new JProgressBar(0, 100);
@@ -94,7 +109,26 @@ public class AutoUpdate {
         new Thread(() -> {
             try {
                 // Save to temp file with correct extension
-                File tempFile = File.createTempFile("TerrariaUpdate", extension);
+                Path tempPath;
+                if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+                    tempPath = Files.createTempFile(
+                            "TerrariaUpdate",
+                            extension,
+                            PosixFilePermissions.asFileAttribute(
+                                    EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
+                            )
+                    );
+                } else {
+                    tempPath = Files.createTempFile("TerrariaUpdate", extension);
+                    File temp = tempPath.toFile();
+                    temp.setReadable(false, false);
+                    temp.setWritable(false, false);
+                    temp.setExecutable(false, false);
+                    temp.setReadable(true, true);
+                    temp.setWritable(true, true);
+                }
+                File tempFile = tempPath.toFile();
+
                 URL url = new URL(downloadUrl);
                 HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
                 long fileSize = httpConn.getContentLengthLong();
@@ -131,6 +165,11 @@ public class AutoUpdate {
         progressDialog.setVisible(true);
     }
 
+    /**
+     * Handoff to seperate app to finish updates
+     * @param updateFile the app to update with
+     * @throws IOException
+     */
     private static void handleHandoff(File updateFile) throws IOException {
         String os = System.getProperty("os.name").toLowerCase();
         String installDir = System.getProperty("user.home") + (os.contains("mac") ? "/Applications/Terraria/" : "/Documents/Terraria/");
@@ -167,7 +206,12 @@ public class AutoUpdate {
                 writer.println("del \"" + updateFile.getAbsolutePath() + "\"");
                 writer.println("del \"%~f0\"");
             }
-            new ProcessBuilder("cmd.exe", "/c", "start", "/min", "", batch.getAbsolutePath()).start();
+            String systemRoot = System.getenv("SystemRoot");
+            if (systemRoot == null || systemRoot.trim().isEmpty()) {
+                systemRoot = "C:\\Windows";
+            }
+            String cmdPath = systemRoot + "\\System32\\cmd.exe";
+            new ProcessBuilder(cmdPath, "/c", "start", "/min", "", batch.getAbsolutePath()).start();
             System.exit(0);
         }
     }
