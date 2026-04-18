@@ -1,5 +1,7 @@
 package TerrariaLauncher;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Window;
@@ -7,6 +9,11 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
@@ -79,9 +86,24 @@ public class ThemeManager {
 
             // This updates all open windows instantly
             for (Window window : Window.getWindows()) {
-                javax.swing.SwingUtilities.updateComponentTreeUI(window);
+                SwingUtilities.updateComponentTreeUI(window);
+
+                // After updating the UI, find the JScrollPane and kill its border again
+                if (window instanceof JFrame) {
+                    removeScrollPaneBorders((JFrame) window);
+                }
             }
         } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    private static void removeScrollPaneBorders(Container container) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof JScrollPane) {
+                ((JScrollPane) c).setBorder(BorderFactory.createEmptyBorder());
+            } else if (c instanceof Container) {
+                removeScrollPaneBorders((Container) c);
+            }
+        }
     }
 
     /**

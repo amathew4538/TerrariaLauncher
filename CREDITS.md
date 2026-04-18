@@ -15,3 +15,7 @@ HappyMidas (Steam), [*Steam Workshop - Terraria Lantern Night*](https://steamcom
 Website Inspiration:
 
 Calamity Mod Team, [*Calamity Mod*](https://calamitymod.com/), March 28, 2026 at 9:43 PM
+***
+Light Mode App Background:
+
+MiltVala (Terraria Forums), [*Terraria Forums Post*](https://forums.terraria.org/index.php?threads/terraria-desktop-wallpapers.12644/), Feb 21, 2015

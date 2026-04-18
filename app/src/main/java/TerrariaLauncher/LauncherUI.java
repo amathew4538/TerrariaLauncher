@@ -143,7 +143,7 @@ public class LauncherUI {
      */
     public static JPanel createMiddleWrapper(JPanel instancePanel, JPanel headerWrapper) {
         JScrollPane scrollPane = new JScrollPane(instancePanel);
-        scrollPane.setBorder(null);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
 
@@ -164,7 +164,7 @@ public class LauncherUI {
      * @return the entire bottom panel, JPanel
      * @apiNote Called in {@link TerrariaLauncher#TerrariaLauncher()}
      */
-    public static JPanel createBottomPanel(JPanel mainFrame, File finalLocation, JPanel instancePanel) {
+    public static JPanel createBottomPanel(JPanel mainFrame, File finalLocation, JPanel instancePanel, BackgroundPanel bgPanel) {
         JButton createBtn = new JButton("Create Instance");
         createBtn.setPreferredSize(new Dimension(200, 50));
         createBtn.addActionListener(e -> {
@@ -206,7 +206,10 @@ public class LauncherUI {
 
         JButton themeSwitcherBtn = new JButton("Switch theme");
         quitBtn.setPreferredSize(new Dimension(200, 50));
-        themeSwitcherBtn.addActionListener(e -> ThemeManager.themeSwitcher());
+        themeSwitcherBtn.addActionListener(e -> {
+            ThemeManager.themeSwitcher();
+            bgPanel.updateTheme();
+        });
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setOpaque(false);

@@ -18,7 +18,7 @@ public class TerrariaLauncher {
         JFrame mainFrame = LauncherUI.createMainFrame();
         DebugLogger.log("Main Frame Created");
 
-        BackgroundPanel bgPanel = new BackgroundPanel("/background.png");
+        BackgroundPanel bgPanel = new BackgroundPanel();
         bgPanel.setLayout(new BorderLayout());
         mainFrame.setContentPane(bgPanel);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -43,7 +43,7 @@ public class TerrariaLauncher {
         bgPanel.add(middleWrapper, BorderLayout.CENTER);
         DebugLogger.log("Middle Wrapper Created");
 
-        JPanel bottomPanel = LauncherUI.createBottomPanel(middleWrapper, finalLocation, instancePanel);
+        JPanel bottomPanel = LauncherUI.createBottomPanel(middleWrapper, finalLocation, instancePanel, bgPanel);
         bgPanel.add(bottomPanel, BorderLayout.SOUTH);
         DebugLogger.log("Bottom Panel Created");
 

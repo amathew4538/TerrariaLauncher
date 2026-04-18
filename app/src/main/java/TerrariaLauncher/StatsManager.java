@@ -1,23 +1,32 @@
 package TerrariaLauncher;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class StatsManager {
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     /**
-     * Increases the launch count by 1 for the specific instance.
+     * Increases the launch count by 1 for the specific instance and logs last played date.
      * @param instanceFolder The folder of the mod instance being launched.
      */
     public static void incrementLaunchCount(File instanceFolder) {
         Properties prop = loadStats(instanceFolder);
         int count = 0;
+
         try {
             count = Integer.parseInt(prop.getProperty("launches", "0"));
         } catch (NumberFormatException e) {
             DebugLogger.log("Invalid integer increment: " + e.getMessage());
         }
+
         prop.setProperty("launches", String.valueOf(count + 1));
+
+        String now = LocalDateTime.now().format(dateFormatter);
+        prop.setProperty("lastPlayed", now);
+
         saveStats(instanceFolder, prop);
     }
 
@@ -54,12 +63,21 @@ public class StatsManager {
         } catch (NumberFormatException e) {
             DebugLogger.log("Invalid playtime value in stats file: " + e.getMessage());
         }
+        
         String launches = prop.getProperty("launches", "0");
+        
+        // NEW: Get Last Played date, default to "Never"
+        String lastPlayed = prop.getProperty("lastPlayed", "Never");
         
         long hours = totalMins / 60;
         long mins = totalMins % 60;
         
-        return String.format("Time Played: %dh %dm\nLaunches: %s", hours, mins, launches);
+        return String.format(
+            "Time Played: %dh %dm\n" +
+            "Launches: %s\n" +
+            "Last Played: %s",
+            hours, mins, launches, lastPlayed
+        );
     }
 
     /**
