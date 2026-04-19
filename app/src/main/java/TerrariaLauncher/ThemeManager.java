@@ -3,19 +3,19 @@ package TerrariaLauncher;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.Window;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
@@ -70,30 +70,34 @@ public class ThemeManager {
      * Applies the theme to the app
      */
     public static void applyTheme() {
+        System.setProperty("flatlaf.animatedLafChange", "true");
+
         try {
             if (isDarkMode()) {
-                UIManager.setLookAndFeel(new FlatMacDarkLaf());
+                FlatMacDarkLaf.setup();
             } else {
-                UIManager.setLookAndFeel(new FlatMacLightLaf());
+                FlatMacLightLaf.setup();
             }
-
+        
+            // Handle Font
             URL fontUrl = ThemeManager.class.getResource("/Andy-Bold.ttf");
             if (fontUrl != null) {
                 Font andyFont = Font.createFont(Font.TRUETYPE_FONT, fontUrl.openStream());
-                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(andyFont);
                 setUIFont(andyFont.deriveFont(18f));
             }
-
-            // This updates all open windows instantly
+        
+            FlatLaf.updateUI();
+        
+            // Border removal
             for (Window window : Window.getWindows()) {
-                SwingUtilities.updateComponentTreeUI(window);
-
-                // After updating the UI, find the JScrollPane and kill its border again
                 if (window instanceof JFrame) {
-                    removeScrollPaneBorders((JFrame) window);
+                    refreshInstanceRows((Container) window);
+                    removeScrollPaneBorders((Container) window);
                 }
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static void removeScrollPaneBorders(Container container) {
@@ -116,6 +120,20 @@ public class ThemeManager {
             Object key = keys.nextElement();
             if (UIManager.get(key) instanceof FontUIResource) {
                 UIManager.put(key, font);
+            }
+        }
+    }
+
+    /**
+     * Refreshes the instance row to change colors
+     * @param container the container to update
+     */
+    private static void refreshInstanceRows(Container container) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof InstanceRow) {
+                ((InstanceRow) c).updateRowTheme();
+            } else if (c instanceof Container) {
+                refreshInstanceRows((Container) c);
             }
         }
     }
