@@ -29,11 +29,7 @@ public class InstanceRow extends JPanel {
         setOpaque(false);
 
         // Styling
-        putClientProperty("FlatLaf.style", "arc: 20; background: rgba(30, 35, 60, 200)");
-        setBorder(BorderFactory.createCompoundBorder(
-            new FlatLineBorder(new Insets(0,0,0,0), new Color(60, 70, 110), 2, 20),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
-        ));
+        updateRowTheme();
 
         // Icon Logic
         ImageIcon displayIcon = null;
@@ -129,5 +125,47 @@ public class InstanceRow extends JPanel {
 
         actionPanel.add(menuBtn);
         add(actionPanel, BorderLayout.EAST);
+    }
+
+    /**
+     * Helper to update colors based on Dark/Light mode
+     */
+    public void updateRowTheme() {
+        boolean isDark = ThemeManager.isDarkMode();
+
+        // Define colors
+        String background = isDark ? "rgba(30, 35, 60, 200)" : "rgba(30, 145, 225, 200)";
+        Color borderColor = isDark ? new Color(60, 70, 110) : new Color(100, 180, 240);
+        Color textColor = isDark ? Color.WHITE : Color.BLACK;
+    
+        // Apply FlatLaf dynamic style
+        putClientProperty("FlatLaf.style", "arc: 20; background: " + background);
+    
+        // Update border
+        setBorder(BorderFactory.createCompoundBorder(
+            new FlatLineBorder(new Insets(0,0,0,0), borderColor, 2, 20),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+    
+        // Update text and menu button colors
+        updateComponentColors(this, textColor);
+
+        repaint();
+    }
+
+    /**
+     * Updates the colors of a component
+     * @param container the container to update
+     * @param color the color to update to
+     */
+    private void updateComponentColors(Container container, Color color) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof JLabel || (c instanceof JButton && !((JButton)c).isContentAreaFilled())) {
+                c.setForeground(color);
+            }
+            if (c instanceof Container) {
+                updateComponentColors((Container) c, color);
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 # Credits
 
+Format: Creator, Where it's from, Date
+
 Terminal App on Macos:
 
 George Nachman, [*iTerm2 - macOS Terminal Replacement*](https://iterm2.com/), Latest Update Date/Time
@@ -18,4 +20,4 @@ Calamity Mod Team, [*Calamity Mod*](https://calamitymod.com/), March 28, 2026 at
 ***
 Light Mode App Background:
 
-MiltVala (Terraria Forums), [*Terraria Forums Post*](https://forums.terraria.org/index.php?threads/terraria-desktop-wallpapers.12644/), Feb 21, 2015
+Relogic/amathew4538, *No link because its an in-game screensshot* , Feb 21, 2015
