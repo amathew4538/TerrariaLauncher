@@ -43,7 +43,7 @@ class BackgroundPanel extends JPanel {
      */
     public void updateTheme() {
         this.isDark = ThemeManager.isDarkMode();
-        String resourcePath = isDark ? "/background.png" : "/backgroundLight.png";
+        String resourcePath = isDark ? "/darkModeBackground.png" : "/lightModeBackground.png";
         
         URL imgUrl = TerrariaLauncher.class.getResource(resourcePath);
         if (imgUrl != null) {
