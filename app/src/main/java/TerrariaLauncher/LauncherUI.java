@@ -90,6 +90,7 @@ public class LauncherUI {
             new FlatLineBorder(new Insets(0,0,0,0), new Color(60, 70, 110), 2, 20),
             BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
+        headerPanel.putClientProperty("id", "headerPanel");
 
         JLabel selectLabel = new JLabel("Select Instance:", JLabel.CENTER);
         selectLabel.setForeground(Color.WHITE);

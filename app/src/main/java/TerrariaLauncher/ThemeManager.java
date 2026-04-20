@@ -1,5 +1,6 @@
 package TerrariaLauncher;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -11,7 +12,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -91,8 +95,11 @@ public class ThemeManager {
             // Border removal
             for (Window window : Window.getWindows()) {
                 if (window instanceof JFrame) {
-                    refreshInstanceRows((Container) window);
-                    removeScrollPaneBorders((Container) window);
+                    Container contentPane = ((JFrame) window).getContentPane();
+
+                    refreshInstanceRows(contentPane);
+                    removeScrollPaneBorders(contentPane);
+                    refreshHeaderPanel(contentPane);
                 }
             }
         } catch (Exception ex) {
@@ -100,6 +107,10 @@ public class ThemeManager {
         }
     }
 
+    /**
+     * Removes the scrollpane borders on the instance panel
+     * @param container the container to remove the border from
+     */
     private static void removeScrollPaneBorders(Container container) {
         for (Component c : container.getComponents()) {
             if (c instanceof JScrollPane) {
@@ -131,9 +142,66 @@ public class ThemeManager {
     private static void refreshInstanceRows(Container container) {
         for (Component c : container.getComponents()) {
             if (c instanceof InstanceRow) {
-                ((InstanceRow) c).updateRowTheme();
+                ((InstanceRow) c).updateContainerTheme();
             } else if (c instanceof Container) {
                 refreshInstanceRows((Container) c);
+            }
+        }
+    }
+
+    /**
+     * Refreshes the color of the instance label
+     * @param container
+     */
+    private static void refreshHeaderPanel(Container container) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof JComponent && "headerPanel".equals(((JComponent)c).getClientProperty("id"))) {
+                updateComponentTheme((JComponent)c);
+            } else if (c instanceof Container) {
+                refreshHeaderPanel((Container) c);
+            }
+        }
+    }
+
+    /**
+     * Updates the theme of a component to the app theme
+     * @param component JComponent to update
+     */
+    public static void updateComponentTheme(JComponent component) {
+        boolean isDark = isDarkMode();
+
+        // Define colors
+        String background = isDark ? "rgba(30, 35, 60, 200)" : "rgba(30, 145, 225, 200)";
+        Color borderColor = isDark ? new Color(60, 70, 110) : new Color(100, 180, 240);
+        Color textColor = isDark ? Color.WHITE : Color.BLACK;
+        
+        // Apply FlatLaf dynamic style
+        component.putClientProperty("FlatLaf.style", "arc: 20; background: " + background);
+        
+        // Update border
+        component.setBorder(BorderFactory.createCompoundBorder(
+            new com.formdev.flatlaf.ui.FlatLineBorder(new java.awt.Insets(0,0,0,0), borderColor, 2, 20),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+    
+        // Update text for all children
+        updateChildColors(component, textColor);
+    
+        component.repaint();
+    }
+
+    /**
+     * Updates the colors of the JComponent children
+     * @param container container to update
+     * @param color the color
+     */
+    private static void updateChildColors(Container container, Color color) {
+        for (Component c : container.getComponents()) {
+            if (c instanceof JLabel || (c instanceof JButton && !((JButton)c).isContentAreaFilled())) {
+                c.setForeground(color);
+            }
+            if (c instanceof Container) {
+                updateChildColors((Container) c, color);
             }
         }
     }

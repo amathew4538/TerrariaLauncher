@@ -11,11 +11,6 @@ plugins {
     id("com.gradleup.shadow") version "9.4.1"
 }
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
-
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
@@ -30,6 +25,8 @@ dependencies {
 
     implementation "net.java.dev.jna:jna:5.18.1"
     implementation "net.java.dev.jna:jna-platform:5.18.1"
+
+    implementation 'com.github.JnCrMx:discord-game-sdk4j:v1.0.0'
 
     constraints {
         implementation('org.codehaus.plexus:plexus-utils:4.0.3') {
