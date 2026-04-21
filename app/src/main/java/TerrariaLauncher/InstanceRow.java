@@ -50,8 +50,11 @@ public class InstanceRow extends JPanel {
             add(new JLabel(new ImageIcon(img)), BorderLayout.WEST);
         }
 
+        String instanceName = isBase ? "Base Terraria" : LauncherUtils.formatFolderName(folderName);
+        String isTModLoader = isBase ? "Base Terraria" : "a tModLoader instance";
+
         // Text (title remains in the center)
-        JLabel titleLabel = new JLabel(isBase ? "Base Terraria" : LauncherUtils.formatFolderName(folderName));
+        JLabel titleLabel = new JLabel(instanceName);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(titleLabel.getFont().deriveFont(24f));
         add(titleLabel, BorderLayout.CENTER);
@@ -63,7 +66,10 @@ public class InstanceRow extends JPanel {
         // Launch Button
         JButton launchBtn = new JButton("Launch");
         launchBtn.setPreferredSize(new Dimension(120, 40));
-        launchBtn.addActionListener(e -> LauncherUtils.launchInstance(folderPath));
+        launchBtn.addActionListener(e -> {
+            DiscordRPC.getDiscordRPC().updateStatus(instanceName, "Playing " + isTModLoader);
+            LauncherUtils.launchInstance(folderPath);
+        });
         actionPanel.add(launchBtn);
 
         // Three Dots Menu Button

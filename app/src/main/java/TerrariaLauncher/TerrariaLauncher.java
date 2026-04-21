@@ -58,7 +58,9 @@ public class TerrariaLauncher {
         if (System.getProperty("os.name").toLowerCase().contains("mac")) {
             TerminalChecker.checkTerminalCompatibility();
         }
-    
+
+        DiscordRPC.getDiscordRPC().init();
+
         SwingUtilities.invokeLater(() -> new TerrariaLauncher());
     }
 }

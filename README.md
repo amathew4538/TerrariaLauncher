@@ -24,6 +24,7 @@
 - It also supports Windows<sup>1</sup>
 - It can change active mods in an instance
 - It can delete instances
+- It can launch multiple instances<sup>2</sup>
 
 ***
 
@@ -168,6 +169,7 @@ Contributor panel made with [contrib.rocks](https://contrib.rocks).
 ## Footnotes
 
 <sup>1</sup> Can't edit mods yet. Can't cache mod list yet.
+<sup>2</sup> tModLoader is NOT happy if you try though. The app is fine, however.
 
 ***
 

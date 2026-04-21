@@ -15,7 +15,6 @@ public class LauncherUtils {
      * @param path path to the tModLoader instance
      */
     public static void launchInstance(Path path) {
-        DebugLogger.initDebugWindow();
         String os = System.getProperty("os.name").toLowerCase();
         File folder = path.toFile();
         DebugLogger.log("Starting launch for: " + folder.getName());
