@@ -76,7 +76,7 @@ public class DiscordRPC {
                 }
             });
         } else {
-            DebugLogger.log("Discord RPC: Cannot update - Core or Activity is NULL. (Did init run?)");
+            DebugLogger.log("Discord RPC: Cannot update - Core/Activity is NULL. (Did init run?)");
         }
     }
 

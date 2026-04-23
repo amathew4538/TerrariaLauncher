@@ -177,6 +177,9 @@ public class LauncherUtils {
                             DebugLogger.log("Watcher: Added " + minutesPlayed + "m to playtime.");
                         }
 
+                        DebugLogger.log("Stopping Discord Rich Presence");
+                        DiscordRPC.getDiscordRPC().stop();
+
                         DebugLogger.log("Watcher: Closing Launcher in 3s...");
                         Thread.sleep(3000);
                         System.exit(0);

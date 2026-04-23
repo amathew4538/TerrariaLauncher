@@ -149,9 +149,7 @@ public class AutoUpdate {
                 HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
                 long fileSize = httpConn.getContentLengthLong();
 
-                try (InputStream in = httpConn.getInputStream();
-                     FileOutputStream out = new FileOutputStream(tempFile)) {
-                    
+                try (InputStream in = httpConn.getInputStream(); FileOutputStream out = new FileOutputStream(tempFile)) {
                     byte[] buffer = new byte[8192];
                     int bytesRead;
                     long totalBytesRead = 0;
