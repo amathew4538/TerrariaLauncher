@@ -24,7 +24,7 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 public class ThemeManager {
-    private static final File configFile = LauncherUtils.getConfigFile();
+    private static final File CONFIG_FILE = LauncherUtils.getConfigFile();
     /**
      * Swaps the theme in the config and reapplies it
      */
@@ -61,8 +61,8 @@ public class ThemeManager {
      */
     public static boolean isDarkMode() {
         try {
-            if (!configFile.exists()) return true; // Default to Dark
-            String content = Files.readString(configFile.toPath());
+            if (!CONFIG_FILE.exists()) return true; // Default to Dark
+            String content = Files.readString(CONFIG_FILE.toPath());
             return !content.contains("theme=macLight");
         } catch (Exception e) {
             DebugLogger.log("Dark mode check failed: " + e.getMessage());

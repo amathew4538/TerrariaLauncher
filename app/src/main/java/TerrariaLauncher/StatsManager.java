@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class StatsManager {
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     /**
      * Increases the launch count by 1 for the specific instance and logs last played date.
@@ -24,7 +24,7 @@ public class StatsManager {
 
         prop.setProperty("launches", String.valueOf(count + 1));
 
-        String now = LocalDateTime.now().format(dateFormatter);
+        String now = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         prop.setProperty("lastPlayed", now);
 
         saveStats(instanceFolder, prop);

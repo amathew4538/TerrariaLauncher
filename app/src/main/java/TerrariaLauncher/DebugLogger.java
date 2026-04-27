@@ -71,6 +71,7 @@ public class DebugLogger {
 
     /**
      * Get the app version from config.properties
+     * @return the version as a string
      */
     public static String getAppVersion() {
         try (InputStream input = LauncherUtils.class.getClassLoader().getResourceAsStream("config.properties")) {
@@ -84,7 +85,8 @@ public class DebugLogger {
             if (version == null || version.contains("${")) return "Dev-Build";
 
             return version;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            DebugLogger.log("Error getting version: " + e.getMessage());
             return "Dev-Build";
         }
     }
