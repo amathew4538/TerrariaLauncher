@@ -26,7 +26,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Cache Gradle packages
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 actions/cache
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v5.0.5 actions/cache
         with:
           path: |
             ~/.gradle/caches
@@ -82,7 +82,7 @@ jobs:
 
       - name: Cache iTerm2
         id: cache-iterm
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 actions/cache
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v5.0.5 actions/cache
         with:
           path: iterm.zip
           key: macos-iterm2-${{ steps.iterm_meta.outputs.IT_HASH }}
