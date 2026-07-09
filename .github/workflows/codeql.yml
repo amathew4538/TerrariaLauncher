@@ -35,7 +35,7 @@ jobs:
 
     - name: Set up JDK 17
       if: matrix.language == 'java-kotlin'
-      uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0 of actions/setup-java
+      uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.2.0 of actions/setup-java
       with:
         java-version: '17'
         distribution: 'temurin'
