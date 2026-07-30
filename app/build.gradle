@@ -23,8 +23,8 @@ dependencies {
     implementation 'com.formdev:flatlaf:3.7.1'
 
 
-    implementation "net.java.dev.jna:jna:5.18.1"
-    implementation "net.java.dev.jna:jna-platform:5.18.1"
+    implementation "net.java.dev.jna:jna:5.19.1"
+    implementation "net.java.dev.jna:jna-platform:5.19.1"
 
     implementation 'com.github.JnCrMx:discord-game-sdk4j:v1.0.0'
 
